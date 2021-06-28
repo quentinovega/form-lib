@@ -3,6 +3,7 @@ import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
+import * as constraints from './constraints';
 
 import { Collapse } from './Collapse';
 
@@ -17,14 +18,6 @@ export const Types = {
   text: "TEXT",
   number: "NUMBER",
 }
-
-//todo: export depuis un autre fichier
-export const required = (message = "Ce champ est requis") => ({ message })
-export const min = (min, message = "trop petit") => ({ min, message })
-export const max = (max, message = "trop grand") => ({ max, message })
-export const positive = (message = "trop negatif") => ({ message })
-export const negative = (message = "trop positif") => ({ message })
-export const integer = (message = "an integer please") => ({ message })
 
 //todo: export methode group()
 
@@ -57,10 +50,10 @@ const buildResolver = (schema) => {
             resolver = resolver.negative(negative.message)
           }
           if (min) {
-            resolver = resolver.min(min.min, min.message)
+            resolver = resolver.min(min.value, min.message)
           }
           if (max) {
-            resolver = resolver.max(max.max, max.message)
+            resolver = resolver.max(max.value, max.message)
           }
           return { ...resolvers, [key]: resolver }
         default: return resolvers;
@@ -98,8 +91,9 @@ export const Form = ({ schema, flow, value, onChange }) => {
 
 const Step = ({ entry, step, errors, register, schema }) => {
   if (entry && typeof entry === 'object') {
+    const errored = entry.flow.some(step => !!errors[step])
     return (
-      <Collapse label={entry.label} collapsed={entry.collapsed}>
+      <Collapse label={entry.label} collapsed={entry.collapsed} errored={errored}>
         {entry.flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} />)}
       </Collapse>
     )

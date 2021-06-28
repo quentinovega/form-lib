@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Types, required, min, max, positive, negative, integer } from '../utils/form'
+import * as constraints from '../utils/constraints';
 
 export const BackOffice = (props) => {
 
@@ -35,10 +36,10 @@ export const BackOffice = (props) => {
       help: "l'age du pere du personnage",
 
       constraints: {
-        required: required("l'age du pere est obligatoire"),
+        required: constraints.required("l'age du pere est obligatoire"),
         min: { value: 18, message: "il doit etre majeur" },
-        max: max(130, "il doit etre en vie"),
-        integer: integer("les demi-années ne compte pas vraiment...gamin"),
+        max: constraints.max(130, "il doit etre en vie"),
+        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
         // positive: positive("un age negatif ? il est pas né ton perso ????"),
       }
     },
@@ -49,11 +50,11 @@ export const BackOffice = (props) => {
       help: "l'age du personnage",
 
       constraints: {
-        required: required("le nom est obligatoire"),
+        required: constraints.required("le nom est obligatoire"),
         min: { value: 18, message: "il doit etre majeur" },
-        max: max(130, "il doit etre en vie"),
-        lessThan: { ref: 'fatherAge', message: "plus jeune que son pere" },
-        integer: integer("les demi-années ne compte pas vraiment...gamin"),
+        // max: constraints.max(130, "il doit etre en vie"),
+        // lessThan: { ref: 'fatherAge', message: "plus jeune que son pere" },
+        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
         // positive: positive("un age negatif ? il est pas né ton perso ????"),
       }
     }

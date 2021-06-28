@@ -10,12 +10,11 @@ export const Collapse = (props) => {
   };
 
   return (
-    <div>
+    <div className={classNames('form__collapse', { errored: props.errored })}>
       <hr />
       <div className="form-group row">
-        <label className="col-sm-2 control-label" />
         <div className="col-sm-10" onClick={toggle} style={{ cursor: 'pointer' }}>
-          <span style={{ fontWeight: 'bold', marginTop: 7 }}>{props.label}</span>
+          <span className="form__collapse__label" style={{ fontWeight: 'bold', marginTop: 7 }}>{props.label}</span>
           <button
             type="button"
             className="btn btn-access-negative pull-right btn-sm"
