@@ -1,11 +1,11 @@
 import React from 'react';
-import { Form, types, required, min, max, positive, negative, integer } from '../utils/form'
+import { Form, Types, required, min, max, positive, negative, integer } from '../utils/form'
 
 export const BackOffice = (props) => {
 
   const formSchema = {
     name: {
-      type: types.string,
+      type: Types.string,
       label: 'name',
       placeholder: 'Nom de ton perso',
       className: "col-6",
@@ -13,10 +13,12 @@ export const BackOffice = (props) => {
 
       constraints: {
         required: { message: "le nom est obligatoire" },
-      }
+      },
+      props: {}, //possibilité de merge les props,
+      render: () => {} //possibilité de donner un composant pour dessiner un truc spé
     },
     fatherName: {
-      type: types.string,
+      type: Types.string,
       label: 'name',
       placeholder: 'Nom du pere du perso',
       className: "col-6",
@@ -27,7 +29,7 @@ export const BackOffice = (props) => {
       }
     },
     fatherAge: {
-      type: types.number,
+      type: Types.number,
       label: 'age',
       placeholder: 'son age',
       help: "l'age du pere du personnage",
@@ -41,7 +43,7 @@ export const BackOffice = (props) => {
       }
     },
     age: {
-      type: types.number,
+      type: Types.number,
       label: 'age',
       placeholder: 'son age',
       help: "l'age du personnage",
@@ -64,7 +66,6 @@ export const BackOffice = (props) => {
         'name',
         'age'
       ],
-      // inline: true,
       collapsed: true
     },
     {

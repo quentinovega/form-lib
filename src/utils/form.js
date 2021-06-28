@@ -4,19 +4,21 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
 
-import {Collapse} from './Collapse';
+import { Collapse } from './Collapse';
 
+//todo: export depuis un autre fichier
 /**
  * string: simple text line as input
  * text:  big text input as textarea
  * number: number input (for int or whatever use resolver)
  */
-export const types = {
+export const Types = {
   string: "STRING",
-  text: "text",
+  text: "TEXT",
   number: "NUMBER",
 }
 
+//todo: export depuis un autre fichier
 export const required = (message = "Ce champ est requis") => ({ message })
 export const min = (min, message = "trop petit") => ({ min, message })
 export const max = (max, message = "trop grand") => ({ max, message })
@@ -24,21 +26,23 @@ export const positive = (message = "trop negatif") => ({ message })
 export const negative = (message = "trop positif") => ({ message })
 export const integer = (message = "an integer please") => ({ message })
 
+//todo: export methode group()
+
 
 const buildResolver = (schema) => {
   const shape = Object.entries(schema)
     .reduce((resolvers, [key, props]) => {
-      const { type, required, min, max, integer, positive, negative } = props;
+      const { type, constraints : { required, min, max, integer, positive, negative } } = props;
       let resolver;
       switch (type) {
-        case types.string:
+        case Types.string:
           resolver = yup.string()
           if (required) {
             resolver = resolver.required(required.error)
           }
           return { ...resolvers, [key]: resolver }
-        case types.number:
-          //todo: less than + more than
+        case Types.number:
+          //todo: less than + more than...
           resolver = yup.number()
           if (required) {
             resolver = resolver.required(required.message)
@@ -83,7 +87,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
-      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} schema={schema}/>)}
+      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} schema={schema} />)}
       <div className="d-flex flex-row justify-content-end">
         <button className="btn btn-danger" type="button" onClick={() => reset()}>Annuler</button>
         <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
@@ -92,7 +96,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
   )
 }
 
-const Step = ({entry, step, errors, register, schema}) => {
+const Step = ({ entry, step, errors, register, schema }) => {
   if (entry && typeof entry === 'object') {
     return (
       <Collapse label={entry.label} collapsed={entry.collapsed}>
@@ -102,7 +106,7 @@ const Step = ({entry, step, errors, register, schema}) => {
   }
 
   switch (step.type) {
-    case types.string:
+    case Types.string:
       return (
         <div className="form-group">
           <label htmlFor="title">{entry}</label>
@@ -110,12 +114,12 @@ const Step = ({entry, step, errors, register, schema}) => {
             type="text" id={entry}
             className={classNames("form-control", { 'is-invalid': errors[entry] })}
             name={entry}
-            placeholder={step.placeholder} 
+            placeholder={step.placeholder}
             {...register(entry)} />
           {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
         </div>
       );
-    case types.number:
+    case Types.number:
       return (
         <div className="form-group">
           <label htmlFor="title">{entry}</label>
@@ -131,5 +135,5 @@ const Step = ({entry, step, errors, register, schema}) => {
     default:
       return null;
   }
-  
+
 }
