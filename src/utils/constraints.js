@@ -1,6 +1,20 @@
 export const required = (message = "Ce champ est requis") => ({ message })
-export const min = (min, message = "trop petit") => ({ min, message })
-export const max = (max, message = "trop grand") => ({ max, message })
+
+//string
+export const url = (message = "not an url") => ({ message })
+//todo: length
+//todo: matches
+//todo: email
+//todo: uuid
+
+//number
+export const min = (value, message = "trop petit") => ({ value, message })
+export const max = (value, message = "trop grand") => ({ value, message })
 export const positive = (message = "trop negatif") => ({ message })
 export const negative = (message = "trop positif") => ({ message })
 export const integer = (message = "an integer please") => ({ message })
+export const lessThan = (ref, message = `plus grand que ${ref}`) => ({ ref, message })
+export const moreThan = (ref, message = `plus petit que ${ref}`) => ({ ref, message })
+
+
+//todo: custom ??? (exemple : IP)

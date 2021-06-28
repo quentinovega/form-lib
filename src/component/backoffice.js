@@ -1,10 +1,20 @@
 import React from 'react';
-import { Form, Types, required, min, max, positive, negative, integer } from '../utils/form'
+import { Form } from '../utils/form'
 import * as constraints from '../utils/constraints';
+import { Types } from '../utils/types';
+import {ref, groups} from '../utils/utils'
 
 export const BackOffice = (props) => {
 
   const formSchema = {
+    game: {
+      type: Types.string,
+      label: 'game',
+      placeholder: 'url du game',
+      constraints: {
+        url: constraints.url()
+      }
+    },
     name: {
       type: Types.string,
       label: 'name',
@@ -15,8 +25,8 @@ export const BackOffice = (props) => {
       constraints: {
         required: { message: "le nom est obligatoire" },
       },
-      props: {}, //possibilité de merge les props,
-      render: () => {} //possibilité de donner un composant pour dessiner un truc spé
+      props: {}, //todo: possibilité de merge les props,
+      render: () => { } //todo: possibilité de donner un composant pour dessiner un truc spé
     },
     fatherName: {
       type: Types.string,
@@ -51,16 +61,24 @@ export const BackOffice = (props) => {
 
       constraints: {
         required: constraints.required("le nom est obligatoire"),
-        min: { value: 18, message: "il doit etre majeur" },
-        // max: constraints.max(130, "il doit etre en vie"),
-        // lessThan: { ref: 'fatherAge', message: "plus jeune que son pere" },
+        lessThan: constraints.lessThan(ref('fatherAge'), 'un fils est plus jeune que son père'),
         integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
-        // positive: positive("un age negatif ? il est pas né ton perso ????"),
+      }
+    },
+    bio: {
+      type: Types.text,
+      label: 'biographie',
+      placeholder: 'raconte ton histoire',
+      help: "bio du personnage",
+      props: {
+        rows: 10,
+        cols: 70
       }
     }
   }
 
   const formFlow = [
+    'game',
     {
       label: 'personnage',
       flow: [
@@ -76,8 +94,9 @@ export const BackOffice = (props) => {
         'fatherAge'
       ],
       collapsed: true
-    }
-    
+    },
+    'bio'
+
   ];
 
 

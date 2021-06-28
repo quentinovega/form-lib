@@ -3,39 +3,33 @@ import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
-import * as constraints from './constraints';
+import { Types } from './types';
 
 import { Collapse } from './Collapse';
 
-//todo: export depuis un autre fichier
-/**
- * string: simple text line as input
- * text:  big text input as textarea
- * number: number input (for int or whatever use resolver)
- */
-export const Types = {
-  string: "STRING",
-  text: "TEXT",
-  number: "NUMBER",
-}
+
 
 //todo: export methode group()
 
 
 const buildResolver = (schema) => {
+  const dependencies = [];
   const shape = Object.entries(schema)
     .reduce((resolvers, [key, props]) => {
-      const { type, constraints : { required, min, max, integer, positive, negative } } = props;
+      const { type, constraints: { required, url, min, max, integer, positive, negative, lessThan, moreThan } = {} } = props;
       let resolver;
       switch (type) {
         case Types.string:
+        case Types.text:
           resolver = yup.string()
           if (required) {
-            resolver = resolver.required(required.error)
+            resolver = resolver.required(required.message)
+          }
+          if (url) {
+            resolver = resolver.url(url.message)
           }
           return { ...resolvers, [key]: resolver }
         case Types.number:
-          //todo: less than + more than...
           resolver = yup.number()
           if (required) {
             resolver = resolver.required(required.message)
@@ -55,12 +49,20 @@ const buildResolver = (schema) => {
           if (max) {
             resolver = resolver.max(max.value, max.message)
           }
+          if (moreThan) {
+            resolver = resolver.moreThan(moreThan.ref, moreThan.message)
+            dependencies.push([key, moreThan.ref])
+          }
+          if (lessThan) {
+            resolver = resolver.lessThan(lessThan.ref, lessThan.message)
+            dependencies.push([key, lessThan.ref])
+          }
+
           return { ...resolvers, [key]: resolver }
         default: return resolvers;
       }
     }, {})
-
-  return yup.object().shape(shape);
+  return yup.object().shape(shape, dependencies);
 }
 
 export const Form = ({ schema, flow, value, onChange }) => {
@@ -68,15 +70,6 @@ export const Form = ({ schema, flow, value, onChange }) => {
   const { register, handleSubmit, trigger, formState: { errors }, control, setValue, reset } = useForm({
     resolver: yupResolver(buildResolver(schema))
   });
-
-
-  const testSchema = buildResolver(schema)
-  testSchema
-    .validate({
-      name: 'jimmy',
-      age: 55,
-    })
-    .catch(err => console.debug({ err, message: err.message }));
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
@@ -110,6 +103,20 @@ const Step = ({ entry, step, errors, register, schema }) => {
             name={entry}
             placeholder={step.placeholder}
             {...register(entry)} />
+          {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+        </div>
+      );
+    case Types.text:
+      return (
+        <div className="form-group">
+          <label htmlFor="title">{entry}</label>
+          <textarea
+            type="text" id={entry}
+            className={classNames("form-control", { 'is-invalid': errors[entry] })}
+            name={entry}
+            placeholder={step.placeholder}
+            {...register(entry)}
+            {...step.props} />
           {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
         </div>
       );
