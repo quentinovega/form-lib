@@ -74,6 +74,12 @@ export const BackOffice = (props) => {
         rows: 10,
         cols: 70
       }
+    },
+    human: {
+      type: Types.bool, //todo: cool si on peu chainer des input ==> input pour le nom de l'espece du perso (option visible peut etre avec une fonction)
+      label: 'is human ?',
+      help: "le personnage est il humain",
+      defaultValue: true
     }
   }
 
@@ -95,7 +101,8 @@ export const BackOffice = (props) => {
       ],
       collapsed: true
     },
-    'bio'
+    'bio',
+    'human'
 
   ];
 

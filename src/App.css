@@ -10,4 +10,13 @@
   color: tomato;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
 
+.input__boolean__on {
+  color: MediumSeaGreen;
+}
+.input__boolean__off {
+  color: tomato;
+}

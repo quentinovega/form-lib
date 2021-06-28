@@ -6,6 +6,9 @@ import classNames from 'classnames';
 import { Types } from './types';
 
 import { Collapse } from './Collapse';
+import { BooleanInput } from './BooleanInput';
+
+import { ToggleLeft, ToggleRight } from 'react-feather';
 
 
 
@@ -73,7 +76,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
-      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} schema={schema} />)}
+      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} schema={schema} control={control} />)}
       <div className="d-flex flex-row justify-content-end">
         <button className="btn btn-danger" type="button" onClick={() => reset()}>Annuler</button>
         <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
@@ -82,7 +85,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
   )
 }
 
-const Step = ({ entry, step, errors, register, schema }) => {
+const Step = ({ entry, step, errors, register, schema, control }) => {
   if (entry && typeof entry === 'object') {
     const errored = entry.flow.some(step => !!errors[step])
     return (
@@ -133,6 +136,25 @@ const Step = ({ entry, step, errors, register, schema }) => {
           {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
         </div>
       );
+    case Types.bool:
+      return (
+        <Controller
+          name={entry}
+          control={control}
+          defaultValue={!!step.defaultValue}
+          render={({ field }) => {
+            return (
+              <div className="form-group">
+                <label htmlFor="title">{entry}</label>
+                <BooleanInput
+                  onChange={field.onChange}
+                  value={field.value}
+                />
+              </div>
+            )
+          }}
+        />
+      )
     default:
       return null;
   }
