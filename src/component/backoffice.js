@@ -80,6 +80,13 @@ export const BackOffice = (props) => {
       label: 'is human ?',
       help: "le personnage est il humain",
       defaultValue: true
+    },
+    genre: {
+      type: Types.select,
+      label: 'genre',
+      help: "le genre du perso personnage",
+      options: ["female", "male", "non-binary"]
+
     }
   }
 
@@ -102,8 +109,8 @@ export const BackOffice = (props) => {
       collapsed: true
     },
     'bio',
-    'human'
-
+    'human',
+    'genre'
   ];
 
 

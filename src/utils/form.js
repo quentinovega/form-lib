@@ -5,14 +5,7 @@ import * as yup from "yup";
 import classNames from 'classnames';
 import { Types } from './types';
 
-import { Collapse } from './Collapse';
-import { BooleanInput } from './BooleanInput';
-
-import { ToggleLeft, ToggleRight } from 'react-feather';
-
-
-
-//todo: export methode group()
+import { BooleanInput, Collapse, SelectInput } from './inputs';
 
 
 const buildResolver = (schema) => {
@@ -145,10 +138,30 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
           render={({ field }) => {
             return (
               <div className="form-group">
-                <label htmlFor="title">{entry}</label>
+                <label htmlFor="title">{step.label}</label>
                 <BooleanInput
                   onChange={field.onChange}
                   value={field.value}
+                />
+              </div>
+            )
+          }}
+        />
+      )
+    case Types.select:
+      return (
+        <Controller
+          name={entry}
+          control={control}
+          defaultValue={!!step.defaultValue}
+          render={({ field }) => {
+            return (
+              <div className="form-group">
+                <label htmlFor="title">{step.label}</label>
+                <SelectInput
+                  onChange={field.onChange}
+                  value={field.value}
+                  possibleValues={step.options}
                 />
               </div>
             )

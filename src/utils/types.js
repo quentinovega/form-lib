@@ -7,7 +7,7 @@ export const Types = {
   string: 'string',
   text: 'text',
   number: 'number',
-  bool: 'bool',  //todo
+  bool: 'bool',
   date: 'date',  //todo
   select: 'select', //todo
   array: 'array', //todo
