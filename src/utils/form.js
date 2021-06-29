@@ -162,6 +162,8 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
                   onChange={field.onChange}
                   value={field.value}
                   possibleValues={step.options}
+                  {...step}
+                  //todo: faut que fetch soit entiereemnt remplacable
                 />
               </div>
             )

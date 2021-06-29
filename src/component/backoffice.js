@@ -85,7 +85,7 @@ export const BackOffice = (props) => {
       type: Types.select,
       label: 'genre',
       help: "le genre du perso personnage",
-      options: ["female", "male", "non-binary"]
+      optionsFrom: "https://formslibtestoptions.opunmaif.fr"
 
     }
   }

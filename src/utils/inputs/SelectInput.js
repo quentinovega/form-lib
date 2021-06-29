@@ -13,12 +13,36 @@ const valueToSelectOption = (value) => {
 };
 
 export const SelectInput = (props) => {
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState(Option(props.possibleValues)
     .map((maybeValues) => maybeValues.find((v) => v.value === props.value))
     .getOrElse(valueToSelectOption(props.value)))
-  const [values, setValues] = useState((props.possibleValues || []).map(valueToSelectOption))
+  const [values, setValues] = useState((props.possibleValues || []).map(valueToSelectOption))  
+
+  useEffect(() => {
+    if (props.optionsFrom) {
+      console.debug("reload values")
+      const cond = Option(props.fetchCondition).map(cond => cond()).getOrElse(true);
+
+      if (cond) {
+        setLoading(true);
+        return fetch(props.optionsFrom, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+        })
+          .then((r) => r.json())
+          .then((values) => values.map(props.transformer || valueToSelectOption))
+          .then((values) => {
+            setValues(values);
+            setValue(values.find((item) => item.value === (value ? value.value : value)) || null);
+            setLoading(false);
+          });
+      }
+    }
+  }, [props])
 
 
   const onChange = (e) => {
