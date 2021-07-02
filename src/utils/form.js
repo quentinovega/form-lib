@@ -5,14 +5,14 @@ import * as yup from "yup";
 import classNames from 'classnames';
 import { Types } from './types';
 
-import { BooleanInput, Collapse, SelectInput } from './inputs';
+import { BooleanInput, Collapse, SelectInput, ArrayInput } from './inputs';
 
 
 const buildResolver = (schema) => {
   const dependencies = [];
   const shape = Object.entries(schema)
     .reduce((resolvers, [key, props]) => {
-      const { type, constraints: { required, url, min, max, integer, positive, negative, lessThan, moreThan } = {} } = props;
+      const { type, constraints: { required, url, min, max, integer, positive, negative, lessThan, moreThan, test, length } = {} } = props;
       let resolver;
       switch (type) {
         case Types.string:
@@ -54,6 +54,25 @@ const buildResolver = (schema) => {
             dependencies.push([key, lessThan.ref])
           }
 
+          return { ...resolvers, [key]: resolver }
+        //todo: select
+        case Types.array:
+          resolver = yup.array().of(yup.string())
+          if (required) {
+            resolver = resolver.required(required.message)
+          }
+          if (min) {
+            resolver = resolver.min(min.value, min.message)
+          }
+          if (max) {
+            resolver = resolver.max(max.value, max.message)
+          }
+          if (test) {
+            resolver = resolver.test(test.name, test.message, test.test)
+          }
+          if (length) {
+            resolver = resolver.length(length.value, length.message)
+          }
           return { ...resolvers, [key]: resolver }
         default: return resolvers;
       }
@@ -165,6 +184,29 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
                   {...step}
                   //todo: faut que fetch soit entiereemnt remplacable
                 />
+                {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+              </div>
+            )
+          }}
+        />
+      )
+    case Types.array:
+      return (
+        <Controller
+          name={entry}
+          control={control}
+          defaultValue={!!step.defaultValue}
+          render={({ field }) => {
+            return (
+              <div className="form-group">
+                <label htmlFor="title">{step.label}</label>
+                <ArrayInput
+                  onChange={field.onChange}
+                  value={field.value}
+                  possibleValues={step.options}
+                  {...step}
+                />
+                {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
               </div>
             )
           }}

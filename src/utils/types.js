@@ -10,7 +10,7 @@ export const Types = {
   bool: 'bool',
   date: 'date',  //todo
   select: 'select',
-  array: 'array', //todo
+  array: 'array',
   object: 'object', //todo
   code: 'code', //todo
   markdown: 'markdown', //todo

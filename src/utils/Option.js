@@ -1,10 +1,10 @@
-export const Option = (x) => (x === undefined || x === null ? None : Some(x));
+export const option = (x) => (x === undefined || x === null ? None : Some(x));
 
 export const Some = (x) => ({
-  map: (f) => Option(f(x)),
+  map: (f) => option(f(x)),
   flatMap: (f) => f(x),
   fold: (_ifEmpty, f) => f(x),
-  orElse: () => Option(x),
+  orElse: () => option(x),
   getOrElse: () => x,
   getOrNull: () => x,
   isDefined: true,
@@ -15,7 +15,7 @@ export const None = {
   map: () => None,
   flatMap: () => None,
   fold: (ifEmpty, _f) => ifEmpty(),
-  orElse: (x) => Option(x),
+  orElse: (x) => option(x),
   getOrElse: (ifEmpty) => ifEmpty,
   getOrNull: () => undefined,
   isDefined: false,

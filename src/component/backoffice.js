@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from '../utils/form'
 import * as constraints from '../utils/constraints';
 import { Types } from '../utils/types';
-import {ref, groups} from '../utils/utils'
+import { ref } from '../utils/utils'
 
 export const BackOffice = (props) => {
 
@@ -23,7 +23,7 @@ export const BackOffice = (props) => {
       style: { color: 'red' },
 
       constraints: {
-        required: { message: "le nom est obligatoire" },
+        // required: { message: "le nom est obligatoire" },
       },
       props: {}, //todo: possibilité de merge les props,
       render: () => { } //todo: possibilité de donner un composant pour dessiner un truc spé
@@ -36,7 +36,7 @@ export const BackOffice = (props) => {
       style: { color: 'red' },
 
       constraints: {
-        required: { message: "le nom du pere est obligatoire" },
+        // required: { message: "le nom du pere est obligatoire" },
       }
     },
     fatherAge: {
@@ -46,11 +46,11 @@ export const BackOffice = (props) => {
       help: "l'age du pere du personnage",
 
       constraints: {
-        required: constraints.required("l'age du pere est obligatoire"),
-        min: { value: 18, message: "il doit etre majeur" },
-        max: constraints.max(130, "il doit etre en vie"),
-        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
-        // positive: positive("un age negatif ? il est pas né ton perso ????"),
+        // required: constraints.required("l'age du pere est obligatoire"),
+        // min: { value: 18, message: "il doit etre majeur" },
+        // max: constraints.max(130, "il doit etre en vie"),
+        // integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
+        // // positive: positive("un age negatif ? il est pas né ton perso ????"),
       }
     },
     age: {
@@ -60,9 +60,9 @@ export const BackOffice = (props) => {
       help: "l'age du personnage",
 
       constraints: {
-        required: constraints.required("le nom est obligatoire"),
-        lessThan: constraints.lessThan(ref('fatherAge'), 'un fils est plus jeune que son père'),
-        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
+        // required: constraints.required("le nom est obligatoire"),
+        // lessThan: constraints.lessThan(ref('fatherAge'), 'un fils est plus jeune que son père'),
+        // integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
       }
     },
     bio: {
@@ -85,7 +85,28 @@ export const BackOffice = (props) => {
       type: Types.select,
       label: 'genre',
       help: "le genre du perso personnage",
-      optionsFrom: "https://formslibtestoptions.opunmaif.fr"
+      // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
+      options: ["male", "female", "non-binary"],
+      // createOption: true
+
+    },
+    weapons: {
+      type: Types.array,
+      label: 'armes',
+      help: "les armes du perso personnage",
+      // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
+      // transformer: (value) => ({label: value.weight, value: value.label}),
+      options: [
+        { label: "toothpick", weight: 0, rarity: 'common' },
+        { label: "sword", weight: 2, rarity: 'common' }, 
+        { label: "bazooka", weight: 10, rarity: 'epic' },
+        { label: "excalibur", weight: 100, rarity: 'legendary' }],
+      constraints: {
+        // min: constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
+        length: constraints.length(2, '2 armes obligatoire'),
+        // test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
+      },
+      // createOption: true,
 
     }
   }
@@ -110,7 +131,8 @@ export const BackOffice = (props) => {
     },
     'bio',
     'human',
-    'genre'
+    'genre',
+    'weapons'
   ];
 
 
