@@ -17,6 +17,7 @@ export const moreThan = (ref, message = `plus petit que ${ref}`) => ({ ref, mess
 
 //array
 export const length = (value, message = `la taille doit etre ${value}`) => ({ value, message })
+//todo: implement array().of() ???
 
 //mixed
 export const test = (name, message = 'test faile', test) => ({name, message, test})

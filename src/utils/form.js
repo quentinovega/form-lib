@@ -56,8 +56,14 @@ const buildResolver = (schema) => {
 
           return { ...resolvers, [key]: resolver }
         //todo: select
+        case Types.select:
+          resolver = yup.string() //todo: build resolver with props.type if value is not string
+          if (required) {
+            resolver = resolver.required(required.message)
+          }
+          return resolver;
         case Types.array:
-          resolver = yup.array().of(yup.string())
+          resolver = yup.array()
           if (required) {
             resolver = resolver.required(required.message)
           }
