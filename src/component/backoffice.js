@@ -36,7 +36,7 @@ export const BackOffice = (props) => {
       style: { color: 'red' },
 
       constraints: {
-        // required: { message: "le nom du pere est obligatoire" },
+        required: { message: "le nom du pere est obligatoire" },
       }
     },
     fatherAge: {
@@ -46,11 +46,11 @@ export const BackOffice = (props) => {
       help: "l'age du pere du personnage",
 
       constraints: {
-        // required: constraints.required("l'age du pere est obligatoire"),
-        // min: { value: 18, message: "il doit etre majeur" },
-        // max: constraints.max(130, "il doit etre en vie"),
-        // integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
-        // // positive: positive("un age negatif ? il est pas né ton perso ????"),
+        required: constraints.required("l'age du pere est obligatoire"),
+        min: { value: 18, message: "il doit etre majeur" },
+        max: constraints.max(130, "il doit etre en vie"),
+        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
+        // positive: positive("un age negatif ? il est pas né ton perso ????"),
       }
     },
     age: {
@@ -60,9 +60,9 @@ export const BackOffice = (props) => {
       help: "l'age du personnage",
 
       constraints: {
-        // required: constraints.required("le nom est obligatoire"),
-        // lessThan: constraints.lessThan(ref('fatherAge'), 'un fils est plus jeune que son père'),
-        // integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
+        required: constraints.required("le nom est obligatoire"),
+        lessThan: constraints.lessThan(ref('fatherAge'), 'un fils est plus jeune que son père'),
+        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
       }
     },
     bio: {
