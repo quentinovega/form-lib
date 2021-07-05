@@ -5,14 +5,9 @@
  */
 export const Types = {
   string: 'string',
-  text: 'text',
   number: 'number',
   bool: 'bool',
   date: 'date',  //todo
-  select: 'select',
-  array: 'array',
-  object: 'object', //todo
-  code: 'code', //todo
-  markdown: 'markdown', //todo
-  arrayForm: 'arrayform' //todo
+  object: 'object',
+  // arrayForm: 'arrayform' //todo
 }

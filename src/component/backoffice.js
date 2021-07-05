@@ -23,7 +23,7 @@ export const BackOffice = (props) => {
       style: { color: 'red' },
 
       constraints: {
-        // required: { message: "le nom est obligatoire" },
+        required: { message: "le nom est obligatoire" },
       },
       props: {}, //todo: possibilité de merge les props,
       render: () => { } //todo: possibilité de donner un composant pour dessiner un truc spé
@@ -60,7 +60,7 @@ export const BackOffice = (props) => {
       help: "l'age du personnage",
 
       constraints: {
-        required: constraints.required("le nom est obligatoire"),
+        required: constraints.required("l'age est obligatoire"),
         lessThan: constraints.lessThan(ref('fatherAge'), 'un fils est plus jeune que son père'),
         integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
       }
@@ -82,16 +82,21 @@ export const BackOffice = (props) => {
       defaultValue: true
     },
     genre: {
-      type: Types.select,
+      type: Types.string,
+      format: 'select',
       label: 'genre',
       help: "le genre du perso personnage",
       // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
       options: ["male", "female", "non-binary"],
-      // createOption: true
+      constraints: {
+        required: constraints.required("le genre est obligatoire"),
+      }
 
     },
     weapons: {
-      type: Types.array,
+      type: Types.object,
+      format: 'select',
+      isMulti: true,
       label: 'armes',
       help: "les armes du perso personnage",
       // optionsFrom: "https://formslibtestoptions.opunmaif.fr",

@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 
 import {BackOffice} from "./component/backoffice"

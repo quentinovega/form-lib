@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
 import { Types } from './types';
 
-import { BooleanInput, Collapse, SelectInput, ArrayInput } from './inputs';
+import { BooleanInput, Collapse, SelectInput } from './inputs';
 
 
 const buildResolver = (schema) => {
@@ -16,8 +16,12 @@ const buildResolver = (schema) => {
       let resolver;
       switch (type) {
         case Types.string:
-        case Types.text:
           resolver = yup.string()
+          //todo: if option && multi ...
+          if (props.multi) {
+            resolver = yup.array().of(yup.string())
+          }
+
           if (required) {
             resolver = resolver.required(required.message)
           }
@@ -27,6 +31,7 @@ const buildResolver = (schema) => {
           return { ...resolvers, [key]: resolver }
         case Types.number:
           resolver = yup.number()
+          //todo: if option && multi ...
           if (required) {
             resolver = resolver.required(required.message)
           }
@@ -53,24 +58,14 @@ const buildResolver = (schema) => {
             resolver = resolver.lessThan(lessThan.ref, lessThan.message)
             dependencies.push([key, lessThan.ref])
           }
-
           return { ...resolvers, [key]: resolver }
-        case Types.select:
-          resolver = yup.string() //todo: build resolver with props.type if value is not string
+        case Types.object:
+          resolver = yup.object();
+          if (props.isMulti) {
+            resolver = yup.array().ensure();
+          }
           if (required) {
             resolver = resolver.required(required.message)
-          }
-          return resolver;
-        case Types.array:
-          resolver = yup.array()
-          if (required) {
-            resolver = resolver.required(required.message)
-          }
-          if (min) {
-            resolver = resolver.min(min.value, min.message)
-          }
-          if (max) {
-            resolver = resolver.max(max.value, max.message)
           }
           if (test) {
             resolver = resolver.test(test.name, test.message, test.test)
@@ -87,7 +82,7 @@ const buildResolver = (schema) => {
 
 export const Form = ({ schema, flow, value, onChange }) => {
 
-  const { register, handleSubmit, trigger, formState: { errors }, control, setValue, reset } = useForm({
+  const { register, handleSubmit, formState: { errors }, control, reset } = useForm({
     resolver: yupResolver(buildResolver(schema))
   });
 
@@ -114,32 +109,61 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
 
   switch (step.type) {
     case Types.string:
-      return (
-        <div className="form-group">
-          <label htmlFor="title">{entry}</label>
-          <input
-            type="text" id={entry}
-            className={classNames("form-control", { 'is-invalid': errors[entry] })}
-            name={entry}
-            placeholder={step.placeholder}
-            {...register(entry)} />
-          {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-        </div>
-      );
-    case Types.text:
-      return (
-        <div className="form-group">
-          <label htmlFor="title">{entry}</label>
-          <textarea
-            type="text" id={entry}
-            className={classNames("form-control", { 'is-invalid': errors[entry] })}
-            name={entry}
-            placeholder={step.placeholder}
-            {...register(entry)}
-            {...step.props} />
-          {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-        </div>
-      );
+      switch (step.format) {
+        case 'text':
+          return (
+            <div className="form-group">
+              <label htmlFor="title">{entry}</label>
+              <textarea
+                type="text" id={entry}
+                className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                name={entry}
+                placeholder={step.placeholder}
+                {...register(entry)}
+                {...step.props} />
+              {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+            </div>
+          );
+        case 'code': //todo
+        case 'markdown': //
+        case 'select':
+          return (
+            <Controller
+              name={entry}
+              control={control}
+              defaultValue={!!step.defaultValue}
+              render={({ field }) => {
+                return (
+                  <div className="form-group">
+                    <label htmlFor="title">{step.label}</label>
+                    <SelectInput
+                      onChange={field.onChange}
+                      value={field.value}
+                      possibleValues={step.options}
+                      {...step}
+                    //todo: faut que fetch soit entiereemnt remplacable
+                    />
+                    {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+                  </div>
+                )
+              }}
+            />
+          )
+        default:
+          return (
+            <div className="form-group">
+              <label htmlFor="title">{entry}</label>
+              <input
+                type="text" id={entry}
+                className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                name={entry}
+                placeholder={step.placeholder}
+                {...register(entry)} />
+              {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+            </div>
+          );
+      }
+
     case Types.number:
       return (
         <div className="form-group">
@@ -172,51 +196,36 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
           }}
         />
       )
-    case Types.select:
-      return (
-        <Controller
-          name={entry}
-          control={control}
-          defaultValue={!!step.defaultValue}
-          render={({ field }) => {
-            return (
-              <div className="form-group">
-                <label htmlFor="title">{step.label}</label>
-                <SelectInput
-                  onChange={field.onChange}
-                  value={field.value}
-                  possibleValues={step.options}
-                  {...step}
-                  //todo: faut que fetch soit entiereemnt remplacable
-                />
-                {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-              </div>
-            )
-          }}
-        />
-      )
-    case Types.array:
-      return (
-        <Controller
-          name={entry}
-          control={control}
-          defaultValue={!!step.defaultValue}
-          render={({ field }) => {
-            return (
-              <div className="form-group">
-                <label htmlFor="title">{step.label}</label>
-                <ArrayInput
-                  onChange={field.onChange}
-                  value={field.value}
-                  possibleValues={step.options}
-                  {...step}
-                />
-                {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-              </div>
-            )
-          }}
-        />
-      )
+
+    case Types.object:
+      switch (step.format) {
+        case 'select':
+          return (
+            <Controller
+              name={entry}
+              control={control}
+              defaultValue={step.defaultValue}
+              render={({ field }) => {
+
+                return (
+                  <div className="form-group">
+                    <label htmlFor="title">{step.label}</label>
+                    <SelectInput
+                      onChange={field.onChange}
+                      value={field.value}
+                      possibleValues={step.options}
+                      {...step}
+                    //todo: faut que fetch soit entiereemnt remplacable
+                    />
+                    {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+                  </div>
+                )
+              }}
+            />
+          )
+        default:
+          return null;
+      }
     default:
       return null;
   }

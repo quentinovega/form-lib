@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
-import { option } from '../option';
+import { option } from '../Option';
 
 const valueToSelectoption = (value) => {
   if (value === null) {
@@ -15,16 +15,13 @@ const valueToSelectoption = (value) => {
 
 export const SelectInput = (props) => {
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState(option(props.possibleValues)
-    .map((maybeValues) => maybeValues.find((v) => v.value === props.value))
-    .getOrElse(valueToSelectoption(props.value)))
-  const [values, setValues] = useState((props.possibleValues || []).map(valueToSelectoption))  
+  const [value, setValue] = useState(props.isMulti ? [] : undefined)
+  const [values, setValues] = useState((props.possibleValues || []).map(valueToSelectoption))
 
   useEffect(() => {
     //todo: why reload after choose option
     //todo: nice to have a fucntion to replace our fetch
     if (props.optionsFrom) {
-      console.debug("reload values")
       const cond = option(props.fetchCondition).map(cond => cond()).getOrElse(true);
 
       if (cond) {
@@ -48,9 +45,13 @@ export const SelectInput = (props) => {
   }, [props, value])
 
 
-  const onChange = (e) => {
-    setValue(e)
-    props.onChange(e?.value);
+  const onChange = (changes) => {
+    setValue(changes)
+    if (props.isMulti) {
+      props.onChange(changes.map(x => x.value))
+    } else {
+      props.onChange(changes.value);
+    }
   };
 
   return (
@@ -59,6 +60,7 @@ export const SelectInput = (props) => {
         <div style={{ width: '100%' }} className="input-select">
           {props.createOption && (
             <CreatableSelect
+              {...props}
               name={`${props.label}-search`}
               isLoading={loading}
               value={value}
@@ -75,6 +77,7 @@ export const SelectInput = (props) => {
           )}
           {!props.createOption && (
             <Select
+              {...props}
               name={`${props.label}-search`}
               isLoading={loading}
               value={value}
@@ -86,7 +89,7 @@ export const SelectInput = (props) => {
               className="react-form-select"
             />
           )}
-          
+
         </div>
       </div>
     </div>

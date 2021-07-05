@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
-import {option} from '../option'
+import {option} from '../Option'
 
 const valueToSelectOption = (value) => {
   if (value === null) {
@@ -15,7 +15,7 @@ const valueToSelectOption = (value) => {
 
 export const ArrayInput = (props) => {
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState(undefined)
+  const [value] = useState(undefined)
   const [values, setValues] = useState((props.possibleValues || []).map(valueToSelectOption))
 
 
