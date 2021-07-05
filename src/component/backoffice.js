@@ -104,7 +104,7 @@ export const BackOffice = (props) => {
       constraints: {
         // min: constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
         length: constraints.length(2, '2 armes obligatoire'),
-        // test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
+        test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
       },
       
       // createOption: true,

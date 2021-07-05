@@ -8,7 +8,7 @@ export const Some = (x) => ({
   getOrElse: () => x,
   getOrNull: () => x,
   isDefined: true,
-  exists: (f) => Option(f(x)).isDefined,
+  exists: (f) => option(f(x)).isDefined,
 });
 
 export const None = {
