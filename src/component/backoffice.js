@@ -114,6 +114,15 @@ export const BackOffice = (props) => {
       
       // createOption: true,
 
+    },
+    birthday: {
+      type: Types.date,
+      label: 'date d\'anniv',
+      help: "la date de naissance du personnage",
+      constraints: {
+        max: constraints.max(new Date(), 'pas de naissance dans le futur'),
+      },
+
     }
   }
 
@@ -138,7 +147,8 @@ export const BackOffice = (props) => {
     'bio',
     'human',
     'genre',
-    'weapons'
+    'weapons',
+    'birthday'
   ];
 
 

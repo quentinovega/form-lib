@@ -1,6 +1,5 @@
 /**
  * string: simple text line as input
- * text:  big text input as textarea
  * number: number input (for int or whatever use resolver)
  */
 export const Types = {

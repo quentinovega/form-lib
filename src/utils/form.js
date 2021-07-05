@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
 import { Types } from './types';
+import {DatePicker} from 'react-rainbow-components';
 
 import { BooleanInput, Collapse, SelectInput } from './inputs';
 
@@ -74,6 +75,18 @@ const buildResolver = (schema) => {
             resolver = resolver.length(length.value, length.message)
           }
           return { ...resolvers, [key]: resolver }
+        case Types.date:
+          resolver = yup.date();
+          if (required) {
+            resolver = resolver.required(required.message)
+          }
+          if (min) {
+            resolver = resolver.min(min.value, min.message)
+          }
+          if (max) {
+            resolver = resolver.max(max.value, max.message)
+          }
+          return { ...resolvers, [key]: resolver }
         default: return resolvers;
       }
     }, {})
@@ -82,9 +95,11 @@ const buildResolver = (schema) => {
 
 export const Form = ({ schema, flow, value, onChange }) => {
 
-  const { register, handleSubmit, formState: { errors }, control, reset } = useForm({
+  const { register, handleSubmit, formState: { errors }, control, reset, watch } = useForm({
     resolver: yupResolver(buildResolver(schema))
   });
+
+  console.debug(watch())
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
@@ -226,6 +241,31 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
         default:
           return null;
       }
+    case Types.date:
+      return (
+        <Controller
+          name={entry}
+          control={control}
+          defaultValue={step.defaultValue}
+          render={({ field }) => {
+
+            return (
+              <div className="form-group">
+                <label htmlFor="title">{step.label}</label>
+                <DatePicker
+                  id="datePicker-1"
+                  value={field.value}
+                  onChange={field.onChange}
+                  label="DatePicker Label"
+                  formatStyle="large"
+                  // locale={state.locale.name}
+                />
+                {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+              </div>
+            )
+          }}
+        />
+      )
     default:
       return null;
   }
