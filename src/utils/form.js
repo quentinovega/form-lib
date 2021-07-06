@@ -1,10 +1,10 @@
 import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
 import { Types } from './types';
-import {DatePicker} from 'react-rainbow-components';
+import { DatePicker } from 'react-rainbow-components';
 
 import { BooleanInput, Collapse, SelectInput } from './inputs';
 
@@ -19,8 +19,8 @@ const buildResolver = (schema) => {
         case Types.string:
           resolver = yup.string()
           //todo: if option && multi ...
-          if (props.multi) {
-            resolver = yup.array().of(yup.string())
+          if (props.multi || props.format === 'array') {
+            resolver = yup.array().of(yup.string()).ensure()
           }
 
           if (required) {
@@ -28,6 +28,9 @@ const buildResolver = (schema) => {
           }
           if (url) {
             resolver = resolver.url(url.message)
+          }
+          if (length) {
+            resolver = resolver.length(length.value, length.message)
           }
           return { ...resolvers, [key]: resolver }
         case Types.number:
@@ -95,7 +98,7 @@ const buildResolver = (schema) => {
 
 export const Form = ({ schema, flow, value, onChange }) => {
 
-  const { register, handleSubmit, formState: { errors }, control, reset, watch } = useForm({
+  const { register, handleSubmit, formState: { errors }, control, reset, watch, trigger } = useForm({
     resolver: yupResolver(buildResolver(schema))
   });
 
@@ -103,7 +106,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
-      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} schema={schema} control={control} />)}
+      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} schema={schema} control={control} trigger={trigger} />)}
       <div className="d-flex flex-row justify-content-end">
         <button className="btn btn-danger" type="button" onClick={() => reset()}>Annuler</button>
         <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
@@ -112,7 +115,9 @@ export const Form = ({ schema, flow, value, onChange }) => {
   )
 }
 
-const Step = ({ entry, step, errors, register, schema, control }) => {
+const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
+
+
   if (entry && typeof entry === 'object') {
     const errored = entry.flow.some(step => !!errors[step])
     return (
@@ -140,7 +145,11 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
             </div>
           );
         case 'code': //todo
-        case 'markdown': //
+        case 'markdown': //todo
+        case 'array':
+          return (
+            <ArrayStep entry={entry} step={step} trigger={trigger} register={register} control={control} errors={errors} />
+          )
         case 'select':
           return (
             <Controller
@@ -258,7 +267,7 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
                   onChange={field.onChange}
                   label="DatePicker Label"
                   formatStyle="large"
-                  // locale={state.locale.name}
+                // locale={state.locale.name}
                 />
                 {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
               </div>
@@ -270,4 +279,49 @@ const Step = ({ entry, step, errors, register, schema, control }) => {
       return null;
   }
 
+}
+
+
+const ArrayStep = ({entry, step, control, trigger, register, errors}) => {
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    control, // control props comes from useForm (optional: if you are using FormContext)
+    name: entry, // unique name for your Field Array
+    // keyName: "id", default to "id", you can change the key name
+  });
+
+  console.debug({errors})
+
+  return (
+    <div className="form-group">
+      <label htmlFor="title">{step.label}</label>
+      {fields
+        // .sort((a, b) => a.id - b.id)
+        .map((field, idx) => {
+          return (
+            <>
+              <input
+                key={field.id}
+                type="text" id={idx}
+                className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                // name={entry[item]}
+                placeholder={step.placeholder}
+                {...register(`${entry}.${idx}`)} />
+              <div className="input-group-append">
+                <button className="btn btn-danger btn-sm" onClick={() => {
+                  remove(idx)
+                  trigger("comments");
+                }}>remove</button>
+              </div>
+            </>
+          )
+        })}
+      <div>
+        <input type="button" className={classNames("btn btn-info mt-2", { 'is-invalid': errors[entry] })} onClick={() => {
+          append("")
+          trigger(entry);
+        }} value="Add" />
+        {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+      </div>
+    </div>
+  )
 }

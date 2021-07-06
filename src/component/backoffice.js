@@ -120,9 +120,19 @@ export const BackOffice = (props) => {
       label: 'date d\'anniv',
       help: "la date de naissance du personnage",
       constraints: {
+        required: constraints.required('required'),
         max: constraints.max(new Date(), 'pas de naissance dans le futur'),
       },
-
+    },
+    abilities: {
+      type: Types.string,
+      format: 'array',
+      label: 'abilities du perso',
+      help: "abilities help..",
+      constraints: {
+        length: constraints.length(2, '2 abilities obligatoire'),
+        // moreThan: constraints.length(2, '2 abilities min obligatoire')
+      },
     }
   }
 
@@ -148,7 +158,8 @@ export const BackOffice = (props) => {
     'human',
     'genre',
     'weapons',
-    'birthday'
+    'birthday',
+    'abilities'
   ];
 
 
