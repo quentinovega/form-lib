@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { useState } from 'react';
+import {Eye, EyeOff} from 'react-feather';
 
 export const Collapse = (props) => {
   const [collapsed, setCollapsed] = useState(props.initCollapsed || props.collapsed)
@@ -20,7 +21,8 @@ export const Collapse = (props) => {
             className="btn btn-access-negative pull-right btn-sm"
             style={{ float: 'right' }}
             onClick={toggle}>
-            <i className={classNames("fas", { "fa-eye": collapsed, "fa-eye-slash": !collapsed })} />
+              {!!collapsed && <Eye />}
+              {!collapsed && <EyeOff />}
           </button>
         </div>
       </div>

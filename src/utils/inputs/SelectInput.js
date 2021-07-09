@@ -54,45 +54,38 @@ export const SelectInput = (props) => {
     }
   };
 
-  return (
-    <div className="form-group row">
-      <div className="col-sm-10">
-        <div style={{ width: '100%' }} className="input-select">
-          {props.createOption && (
-            <CreatableSelect
-              {...props}
-              name={`${props.label}-search`}
-              isLoading={loading}
-              value={value}
-              isDisabled={props.disabled}
-              placeholder={props.placeholder}
-              isClearable
-              onChange={onChange}
-              options={values}
-              onCreateOption={option => props.onCreateOption ? props.onCreateOption(option) : undefined} //todo: default onCreateOption
-              formatCreateLabel={(value) => props.formatCreateLabel ? props.formatCreateLabel(value) : `create ${value} ?`} //todo: default formatCreateLabel
-              classNamePrefix="react-form-select"
-              className="react-form-select"
-            />
-          )}
-          {!props.createOption && (
-            <Select
-              {...props}
-              name={`${props.label}-search`}
-              isLoading={loading}
-              value={value}
-              isDisabled={props.disabled}
-              placeholder={props.placeholder}
-              options={values}
-              onChange={onChange}
-              classNamePrefix="react-form-select"
-              className="react-form-select"
-            />
-          )}
-
-        </div>
-      </div>
-    </div>
-  )
-
+  if (props.createOption) {
+    return (
+      <CreatableSelect
+        {...props}
+        name={`${props.label}-search`}
+        isLoading={loading}
+        value={value}
+        isDisabled={props.disabled}
+        placeholder={props.placeholder}
+        isClearable
+        onChange={onChange}
+        options={values}
+        onCreateOption={option => props.onCreateOption ? props.onCreateOption(option) : undefined} //todo: default onCreateOption
+        formatCreateLabel={(value) => props.formatCreateLabel ? props.formatCreateLabel(value) : `create ${value} ?`} //todo: default formatCreateLabel
+        classNamePrefix="react-form-select"
+        className={props.className}
+      />
+    )
+  } else {
+    return (
+      <Select
+        {...props}
+        name={`${props.label}-search`}
+        isLoading={loading}
+        value={value}
+        isDisabled={props.disabled}
+        placeholder={props.placeholder}
+        options={values}
+        onChange={onChange}
+        classNamePrefix="react-form-select"
+        className={props.className}
+      />
+    )
+  }
 }

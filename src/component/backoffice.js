@@ -4,6 +4,8 @@ import * as constraints from '../utils/constraints';
 import { Types } from '../utils/types';
 import { ref } from '../utils/utils'
 
+import 'bootstrap/dist/css/bootstrap.min.css'
+
 export const BackOffice = (props) => {
 
   const formSchema = {
@@ -131,6 +133,7 @@ export const BackOffice = (props) => {
       help: "abilities help..",
       constraints: {
         length: constraints.length(2, '2 abilities obligatoire'),
+        max: constraints.max(10, "max 10")
         // moreThan: constraints.length(2, '2 abilities min obligatoire')
       },
     }
@@ -164,7 +167,7 @@ export const BackOffice = (props) => {
 
 
   return (
-    <div>
+    <div className="container-xxl my-md-4 bd-layout">
       <h1>BaCk OffIcE</h1>
 
       <div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -35,6 +35,9 @@ const buildResolver = (schema) => {
           return { ...resolvers, [key]: resolver }
         case Types.number:
           resolver = yup.number()
+          if (props.multi || props.format === 'array') {
+            resolver = yup.array().of(yup.number()).ensure()
+          }
           //todo: if option && multi ...
           if (required) {
             resolver = resolver.required(required.message)
@@ -98,15 +101,17 @@ const buildResolver = (schema) => {
 
 export const Form = ({ schema, flow, value, onChange }) => {
 
-  const { register, handleSubmit, formState: { errors }, control, reset, watch, trigger } = useForm({
+  const { register, handleSubmit, formState: { errors }, control, reset, watch, trigger, getValues, setValue } = useForm({
     resolver: yupResolver(buildResolver(schema))
   });
 
-  console.debug(watch())
+  // console.debug(watch())
+  console.debug(errors)
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
-      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} schema={schema} control={control} trigger={trigger} />)}
+      {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
+        register={register} schema={schema} control={control} trigger={trigger} getValues={getValues} setValue={setValue} />)}
       <div className="d-flex flex-row justify-content-end">
         <button className="btn btn-danger" type="button" onClick={() => reset()}>Annuler</button>
         <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
@@ -115,7 +120,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
   )
 }
 
-const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
+const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue }) => {
 
 
   if (entry && typeof entry === 'object') {
@@ -133,7 +138,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
         case 'text':
           return (
             <div className="form-group">
-              <label htmlFor="title">{entry}</label>
+              <label className="form-label" htmlFor={entry}>{entry}</label>
               <textarea
                 type="text" id={entry}
                 className={classNames("form-control", { 'is-invalid': errors[entry] })}
@@ -148,7 +153,18 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
         case 'markdown': //todo
         case 'array':
           return (
-            <ArrayStep entry={entry} step={step} trigger={trigger} register={register} control={control} errors={errors} />
+            <ArrayStep
+              entry={entry} step={step} trigger={trigger}
+              register={register} control={control} errors={errors}
+              setValue={setValue} values={getValues(entry)} defaultValue={""} //todo: real defaultValue
+              component={(props => {
+                return (
+                  <input
+                    type="text"
+                    className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                    placeholder={step.placeholder} {...props} />
+                )
+              })} />
           )
         case 'select':
           return (
@@ -158,9 +174,10 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
               defaultValue={!!step.defaultValue}
               render={({ field }) => {
                 return (
-                  <div className="form-group">
-                    <label htmlFor="title">{step.label}</label>
+                  <div className="mb-3">
+                    <label className="form-label" htmlFor={entry}>{step.label}</label>
                     <SelectInput
+                      className={classNames('test555555555555', { 'is-invalid': errors[entry] })}
                       onChange={field.onChange}
                       value={field.value}
                       possibleValues={step.options}
@@ -175,8 +192,8 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
           )
         default:
           return (
-            <div className="form-group">
-              <label htmlFor="title">{entry}</label>
+            <div className="mb-3">
+              <label className="form-label" htmlFor={entry}>{entry}</label>
               <input
                 type="text" id={entry}
                 className={classNames("form-control", { 'is-invalid': errors[entry] })}
@@ -189,18 +206,38 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
       }
 
     case Types.number:
-      return (
-        <div className="form-group">
-          <label htmlFor="title">{entry}</label>
-          <input
-            type="number" id={entry}
-            className={classNames("form-control", { 'is-invalid': errors[entry] })}
-            name={entry}
-            placeholder={step.placeholder}
-            {...register(entry)} />
-          {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-        </div>
-      );
+      switch (step.format) {
+        case 'array':
+          return (
+            <ArrayStep
+              entry={entry} step={step} trigger={trigger}
+              register={register} control={control} errors={errors}
+              values={getValues(entry)} defaultValue={0} //todo: real default value
+              component={(props => {
+                return (
+                  <input
+                    type="number"
+                    className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                    placeholder={step.placeholder} {...props} />
+                )
+              })} />
+          )
+
+        default:
+          return (
+            <div className="form-group">
+              <label className="form-label" htmlFor={entry}>{entry}</label>
+              <input
+                type="number" id={entry}
+                className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                name={entry}
+                placeholder={step.placeholder}
+                {...register(entry)} />
+              {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
+            </div>
+          );
+      }
+
     case Types.bool:
       return (
         <Controller
@@ -210,11 +247,13 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
           render={({ field }) => {
             return (
               <div className="form-group">
-                <label htmlFor="title">{step.label}</label>
+                <label className="form-label" htmlFor={entry}>{step.label}</label>
                 <BooleanInput
+                  className={classNames({ 'is-invalid': errors[entry] })}
                   onChange={field.onChange}
                   value={field.value}
                 />
+                {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
               </div>
             )
           }}
@@ -231,10 +270,12 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
               defaultValue={step.defaultValue}
               render={({ field }) => {
 
+                console.debug({field, errors})
                 return (
                   <div className="form-group">
-                    <label htmlFor="title">{step.label}</label>
+                    <label className="form-label" htmlFor={entry}>{step.label}</label>
                     <SelectInput
+                      className={classNames({ 'is-invalid': errors[entry] })}
                       onChange={field.onChange}
                       value={field.value}
                       possibleValues={step.options}
@@ -260,12 +301,12 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
 
             return (
               <div className="form-group">
-                <label htmlFor="title">{step.label}</label>
+                <label className="form-label" htmlFor={entry}>{step.label}</label>
                 <DatePicker
                   id="datePicker-1"
+                  className={classNames({ 'is-invalid': errors[entry] })}
                   value={field.value}
                   onChange={field.onChange}
-                  label="DatePicker Label"
                   formatStyle="large"
                 // locale={state.locale.name}
                 />
@@ -282,42 +323,33 @@ const Step = ({ entry, step, errors, register, schema, control, trigger }) => {
 }
 
 
-const ArrayStep = ({entry, step, control, trigger, register, errors}) => {
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+const ArrayStep = ({ entry, step, control, trigger, register, errors, component, values, defaultValue, setValue }) => {
+  const { fields, append, remove } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
     name: entry, // unique name for your Field Array
     // keyName: "id", default to "id", you can change the key name
   });
 
-  console.debug({errors})
-
   return (
     <div className="form-group">
-      <label htmlFor="title">{step.label}</label>
+      <label htmlFor={entry}>{step.label}</label>
       {fields
-        // .sort((a, b) => a.id - b.id)
         .map((field, idx) => {
           return (
-            <>
-              <input
-                key={field.id}
-                type="text" id={idx}
-                className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                // name={entry[item]}
-                placeholder={step.placeholder}
-                {...register(`${entry}.${idx}`)} />
+            <div key={field.id} className="d-flex flex-row">
+              {component({ key: field.id, ...register(`${entry}.${idx}`), ...field })}
               <div className="input-group-append">
                 <button className="btn btn-danger btn-sm" onClick={() => {
                   remove(idx)
                   trigger("comments");
                 }}>remove</button>
               </div>
-            </>
+            </div>
           )
         })}
       <div>
         <input type="button" className={classNames("btn btn-info mt-2", { 'is-invalid': errors[entry] })} onClick={() => {
-          append("")
+          append(defaultValue)
           trigger(entry);
         }} value="Add" />
         {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
