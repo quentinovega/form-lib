@@ -106,7 +106,6 @@ export const Form = ({ schema, flow, value, onChange }) => {
   });
 
   // console.debug(watch())
-  console.debug(errors)
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
@@ -269,8 +268,6 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               control={control}
               defaultValue={step.defaultValue}
               render={({ field }) => {
-
-                console.debug({field, errors})
                 return (
                   <div className="form-group">
                     <label className="form-label" htmlFor={entry}>{step.label}</label>
