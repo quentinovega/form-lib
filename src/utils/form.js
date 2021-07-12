@@ -8,94 +8,37 @@ import { DatePicker } from 'react-rainbow-components';
 
 import { BooleanInput, Collapse, SelectInput } from './inputs';
 
+import {StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver} from './resolvers';
+
 
 const buildResolver = (schema) => {
   const dependencies = [];
   const shape = Object.entries(schema)
     .reduce((resolvers, [key, props]) => {
-      const { type, constraints: { required, url, min, max, integer, positive, negative, lessThan, moreThan, test, length } = {} } = props;
+      const { type, constraints = {} } = props;
       let resolver;
       switch (type) {
         case Types.string:
-          resolver = yup.string()
-          //todo: if option && multi ...
-          if (props.multi || props.format === 'array') {
-            resolver = yup.array().of(yup.string()).ensure()
-          }
-
-          if (required) {
-            resolver = resolver.required(required.message)
-          }
-          if (url) {
-            resolver = resolver.url(url.message)
-          }
-          if (length) {
-            resolver = resolver.length(length.value, length.message)
-          }
-          return { ...resolvers, [key]: resolver }
+          resolver = new StringResolver(constraints).toResolver();
+          break;
         case Types.number:
-          resolver = yup.number()
-          if (props.multi || props.format === 'array') {
-            resolver = yup.array().of(yup.number()).ensure()
-          }
-          //todo: if option && multi ...
-          if (required) {
-            resolver = resolver.required(required.message)
-          }
-          if (integer) {
-            resolver = resolver.integer(integer.message)
-          }
-          if (positive) {
-            resolver = resolver.positive(positive.message)
-          }
-          if (negative) {
-            resolver = resolver.negative(negative.message)
-          }
-          if (min) {
-            resolver = resolver.min(min.value, min.message)
-          }
-          if (max) {
-            resolver = resolver.max(max.value, max.message)
-          }
-          if (moreThan) {
-            resolver = resolver.moreThan(moreThan.ref, moreThan.message)
-            dependencies.push([key, moreThan.ref])
-          }
-          if (lessThan) {
-            resolver = resolver.lessThan(lessThan.ref, lessThan.message)
-            dependencies.push([key, lessThan.ref])
-          }
-          return { ...resolvers, [key]: resolver }
+          resolver = new NumberResolver(constraints).toResolver();
+          break;
+        case Types.bool:
+          resolver = new BooleanResolver(constraints).toResolver();
+          break;
         case Types.object:
-          resolver = yup.object();
-          if (props.isMulti) {
-            resolver = yup.array().ensure();
-          }
-          if (required) {
-            resolver = resolver.required(required.message)
-          }
-          if (test) {
-            resolver = resolver.test(test.name, test.message, test.test)
-          }
-          if (length) {
-            resolver = resolver.length(length.value, length.message)
-          }
-          return { ...resolvers, [key]: resolver }
+          resolver = new ObjectResolver(constraints).toResolver();
+          break;
         case Types.date:
-          resolver = yup.date();
-          if (required) {
-            resolver = resolver.required(required.message)
-          }
-          if (min) {
-            resolver = resolver.min(min.value, min.message)
-          }
-          if (max) {
-            resolver = resolver.max(max.value, max.message)
-          }
-          return { ...resolvers, [key]: resolver }
-        default: return resolvers;
-      }
+          resolver = new DateResolver(constraints).toResolver();
+          break;
+        default:
+          break;
+        }
+        return { ...resolvers, [key]: resolver }
     }, {})
+    console.debug({shape})
   return yup.object().shape(shape, dependencies);
 }
 

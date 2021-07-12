@@ -149,20 +149,20 @@ export const BackOffice = (props) => {
       ],
       collapsed: true
     },
-    {
-      label: 'pere du personnage',
-      flow: [
-        'fatherName',
-        'fatherAge'
-      ],
-      collapsed: true
-    },
+    // {
+    //   label: 'pere du personnage',
+    //   flow: [
+    //     'fatherName',
+    //     'fatherAge'
+    //   ],
+    //   collapsed: true
+    // },
     'bio',
     'human',
-    'genre',
-    'weapons',
+    // 'genre',
+    // 'weapons',
     'birthday',
-    'abilities'
+    // 'abilities'
   ];
 
 
