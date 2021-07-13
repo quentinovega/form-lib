@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -8,37 +7,49 @@ import { DatePicker } from 'react-rainbow-components';
 
 import { BooleanInput, Collapse, SelectInput } from './inputs';
 
-import {StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver} from './resolvers';
+import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
+
+const buildSubResolver = (props) => {
+  let resolver;
+  const { type, constraints = {} } = props;
+  if (props.format === 'array' || props.multi) {
+    let subResolver = props.schema && buildSubResolver(props.schema)
+    //todo: gerer les 2 cas array de primitives ou object array
+    console.debug({ props, subResolver })
+    resolver = new ArrayResolver(constraints).toResolver(subResolver);
+  } else {
+    switch (type) {
+      case Types.string:
+        resolver = new StringResolver(constraints).toResolver();
+        break;
+      case Types.number:
+        resolver = new NumberResolver(constraints).toResolver();
+        break;
+      case Types.bool:
+        resolver = new BooleanResolver(constraints).toResolver();
+        break;
+      case Types.object:
+        resolver = new ObjectResolver(constraints).toResolver();
+        break;
+      case Types.date:
+        resolver = new DateResolver(constraints).toResolver();
+        break;
+      default:
+        break;
+    }
+  }
+  return resolver
+}
 
 
 const buildResolver = (schema) => {
   const dependencies = [];
   const shape = Object.entries(schema)
     .reduce((resolvers, [key, props]) => {
-      const { type, constraints = {} } = props;
-      let resolver;
-      switch (type) {
-        case Types.string:
-          resolver = new StringResolver(constraints).toResolver();
-          break;
-        case Types.number:
-          resolver = new NumberResolver(constraints).toResolver();
-          break;
-        case Types.bool:
-          resolver = new BooleanResolver(constraints).toResolver();
-          break;
-        case Types.object:
-          resolver = new ObjectResolver(constraints).toResolver();
-          break;
-        case Types.date:
-          resolver = new DateResolver(constraints).toResolver();
-          break;
-        default:
-          break;
-        }
-        return { ...resolvers, [key]: resolver }
+      const resolver = buildSubResolver(props);
+      return { ...resolvers, [key]: resolver }
     }, {})
-    console.debug({shape})
+  console.debug({ shape })
   return yup.object().shape(shape, dependencies);
 }
 
@@ -99,12 +110,15 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               entry={entry} step={step} trigger={trigger}
               register={register} control={control} errors={errors}
               setValue={setValue} values={getValues(entry)} defaultValue={""} //todo: real defaultValue
-              component={(props => {
+              component={((props, idx) => {
                 return (
-                  <input
-                    type="text"
-                    className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                    placeholder={step.placeholder} {...props} />
+                  <>
+                    <input
+                      type="text"
+                      className={classNames("form-control", { 'is-invalid': errors[entry] && errors[entry][idx] })}
+                      placeholder={step.placeholder} {...props} />
+                    {errors[entry] && errors[entry][idx] && <div className="invalid-feedback">{errors[entry][idx].message}</div>}
+                  </>
                 )
               })} />
           )
@@ -277,7 +291,7 @@ const ArrayStep = ({ entry, step, control, trigger, register, errors, component,
         .map((field, idx) => {
           return (
             <div key={field.id} className="d-flex flex-row">
-              {component({ key: field.id, ...register(`${entry}.${idx}`), ...field })}
+              {component({ key: field.id, ...register(`${entry}.${idx}`), ...field }, idx)}
               <div className="input-group-append">
                 <button className="btn btn-danger btn-sm" onClick={() => {
                   remove(idx)
