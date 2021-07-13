@@ -63,7 +63,7 @@ export const BackOffice = (props) => {
 
       constraints: {
         required: constraints.required("l'age est obligatoire"),
-        lessThan: constraints.lessThan(ref('fatherAge'), 'un fils est plus jeune que son père'),
+        lessThan: constraints.lessThan('fatherAge', 'un fils est plus jeune que son père'),
         integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
       }
     },
@@ -146,7 +146,7 @@ export const BackOffice = (props) => {
         type: Types.string,
         constraints: {
           required: constraints.required('required'),
-          min: constraints.min(1, 'au moins une lettre'),
+          min: constraints.min(5, 'au moins 5 lettres'),
         }
       },
       constraints: {
@@ -167,14 +167,14 @@ export const BackOffice = (props) => {
       ],
       collapsed: true
     },
-    // {
-    //   label: 'pere du personnage',
-    //   flow: [
-    //     'fatherName',
-    //     'fatherAge'
-    //   ],
-    //   collapsed: true
-    // },
+    {
+      label: 'pere du personnage',
+      flow: [
+        'fatherName',
+        'fatherAge'
+      ],
+      collapsed: true
+    },
     'bio',
     'human',
     // 'genre',

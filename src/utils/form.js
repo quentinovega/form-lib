@@ -9,30 +9,35 @@ import { BooleanInput, Collapse, SelectInput } from './inputs';
 
 import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
 
-const buildSubResolver = (props) => {
+const buildSubResolver = (props, key, dependencies) => {
   let resolver;
   const { type, constraints = {} } = props;
-  if (props.format === 'array' || props.multi) {
-    let subResolver = props.schema && buildSubResolver(props.schema)
-    //todo: gerer les 2 cas array de primitives ou object array
-    console.debug({ props, subResolver })
-    resolver = new ArrayResolver(constraints).toResolver(subResolver);
+  if (props.format === 'array' || props.isMulti) {
+    let subResolver;
+
+    if (props.schema && props.schema.type) {
+      subResolver = buildSubResolver(props.schema, key, dependencies)
+    } else if (props.schema) {
+      subResolver = buildResolver(props.schema)
+    }
+
+    resolver = new ArrayResolver(constraints).toResolver(subResolver, key, dependencies);
   } else {
     switch (type) {
       case Types.string:
-        resolver = new StringResolver(constraints).toResolver();
+        resolver = new StringResolver(constraints).toResolver(key, dependencies);
         break;
       case Types.number:
-        resolver = new NumberResolver(constraints).toResolver();
+        resolver = new NumberResolver(constraints).toResolver(key, dependencies);
         break;
       case Types.bool:
-        resolver = new BooleanResolver(constraints).toResolver();
+        resolver = new BooleanResolver(constraints).toResolver(key, dependencies);
         break;
       case Types.object:
-        resolver = new ObjectResolver(constraints).toResolver();
+        resolver = new ObjectResolver(constraints).toResolver(key, dependencies);
         break;
       case Types.date:
-        resolver = new DateResolver(constraints).toResolver();
+        resolver = new DateResolver(constraints).toResolver(key, dependencies);
         break;
       default:
         break;
@@ -42,14 +47,12 @@ const buildSubResolver = (props) => {
 }
 
 
-const buildResolver = (schema) => {
-  const dependencies = [];
+const buildResolver = (schema, dependencies = []) => {
   const shape = Object.entries(schema)
     .reduce((resolvers, [key, props]) => {
-      const resolver = buildSubResolver(props);
+      const resolver = buildSubResolver(props, key, dependencies);
       return { ...resolvers, [key]: resolver }
     }, {})
-  console.debug({ shape })
   return yup.object().shape(shape, dependencies);
 }
 
@@ -59,7 +62,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
     resolver: yupResolver(buildResolver(schema))
   });
 
-  // console.debug(watch())
+  console.debug(watch())
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
@@ -75,7 +78,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
 
 const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue }) => {
 
-
+console.debug({errors})
   if (entry && typeof entry === 'object') {
     const errored = entry.flow.some(step => !!errors[step])
     return (

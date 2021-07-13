@@ -30,9 +30,28 @@ export class StringResolver extends BaseResolver {
   uuid?: Constraint;
   matches?: Constraint;
 
-  toResolver() {
-    const test = yup.string();
+  toResolver(key: string, dependencies: any) {
+    let resolver = yup.string();
 
-    return super.toBaseResolver(test)
+    if (this.min) {
+      resolver = resolver.min(Number(this.min.value), this.min.message)
+    }
+    if (this.max) {
+      resolver = resolver.max(Number(this.max.value), this.max.message)
+    }
+    if (this.email) {
+      resolver = resolver.email(this.email.message)
+    }
+    if (this.url) {
+      resolver = resolver.url(this.url.message)
+    }
+    if (this.uuid) {
+      resolver = resolver.uuid(this.uuid.message)
+    }
+    if (this.matches && this.matches.regexp) {
+      resolver = resolver.matches(this.matches.regexp, { message: this.matches.message})
+    }
+
+    return super.toBaseResolver(resolver, key, dependencies)
   }
 }

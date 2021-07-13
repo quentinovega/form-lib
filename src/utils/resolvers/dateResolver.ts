@@ -19,9 +19,8 @@ export class DateResolver extends BaseResolver {
   min?: Constraint;
   max?: Constraint;
 
-  toResolver() {
+  toResolver(key: string, dependencies: any) {
     let resolver = yup.date();
-
 
 
     // if (props.multi || props.format === 'array') {
@@ -38,6 +37,6 @@ export class DateResolver extends BaseResolver {
       resolver = resolver.max(this.max.value, this.max.message)
     }
 
-    return super.toBaseResolver(resolver)
+    return super.toBaseResolver(resolver, key, dependencies)
   }
 }

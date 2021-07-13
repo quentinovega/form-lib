@@ -18,9 +18,9 @@ export class BooleanResolver extends BaseResolver {
     super(constraints)
   }
 
-  toResolver() {
+  toResolver(key: string, dependencies: any) {
     let resolver = yup.bool(); 
 
-    return super.toBaseResolver(resolver)
+    return super.toBaseResolver(resolver, key, dependencies)
   }
 }

@@ -16,9 +16,9 @@ export class ObjectResolver extends BaseResolver {
 
   shape: Constraint
 
-  toResolver() {
+  toResolver(key: string, dependencies: any) {
     let resolver = yup.object();
 
-    return super.toBaseResolver(resolver)
+    return super.toBaseResolver(resolver, key, dependencies)
   }
 }

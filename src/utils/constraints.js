@@ -20,7 +20,7 @@ export const length = (value, message = `la taille doit etre ${value}`) => ({ va
 //todo: implement array().of() ???
 
 //mixed
-export const test = (name, message = 'test faile', test) => ({name, message, test})
+export const test = (ref, message = 'test faile', test) => ({ref, message, test})
 
 
 //todo: custom ??? (exemple : IP)

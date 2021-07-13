@@ -33,7 +33,7 @@ export class NumberResolver extends BaseResolver {
   lessThan?: Constraint;
   moreThan?: Constraint;
 
-  toResolver() {
+  toResolver(key: string, dependencies: any) {
     let resolver = yup.number();
 
 
@@ -61,14 +61,28 @@ export class NumberResolver extends BaseResolver {
       resolver = resolver.max(Number(this.max.value), this.max.message)
     }
     if (this.moreThan && this.moreThan.ref) {
-      resolver = resolver.moreThan(Number(this.moreThan.ref), this.moreThan.message)
-      // dependencies.push([key, moreThan.ref])
+      if (typeof this.moreThan.ref === 'string') {
+        resolver = resolver.moreThan(yup.ref(this.moreThan.ref), this.moreThan.message)
+      }
+
+      if (typeof this.moreThan.ref === 'number') {
+        resolver = resolver.moreThan(Number(this.moreThan.ref), this.moreThan.message)
+      }
+
+      dependencies.push([key, this.moreThan.ref])
     }
     if (this.lessThan && this.lessThan.ref) {
-      resolver = resolver.lessThan(Number(this.lessThan.ref), this.lessThan.message)
-      // dependencies.push([key, lessThan.ref])
+      if (typeof this.lessThan.ref === 'string') {
+        resolver = resolver.lessThan(yup.ref(this.lessThan.ref), this.lessThan.message)
+      }
+
+      if (typeof this.lessThan.ref === 'number') {
+        resolver = resolver.lessThan(Number(this.lessThan.ref), this.lessThan.message)
+      }
+
+      dependencies.push([key, this.lessThan.ref])
     }
 
-    return super.toBaseResolver(resolver)
+    return super.toBaseResolver(resolver, key, dependencies)
   }
 }

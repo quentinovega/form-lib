@@ -3,6 +3,7 @@ export interface Constraint {
   message: string;
   ref?: string | number;
   test?: () => boolean;
+  regexp?:RegExp
 }
 
 export type BaseResolverConstraints = {
