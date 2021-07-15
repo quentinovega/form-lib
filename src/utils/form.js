@@ -8,6 +8,7 @@ import { DatePicker } from 'react-rainbow-components';
 import { BooleanInput, Collapse, SelectInput } from './inputs';
 
 import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
+import { option } from '../utils/Option'
 
 const buildSubResolver = (props, key, dependencies) => {
   let resolver;
@@ -64,10 +65,11 @@ export const Form = ({ schema, flow, value, onChange }) => {
 
   // console.debug(watch())
 
+  // console.debug({ errors })
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
-        register={register} schema={schema} control={control} trigger={trigger} getValues={getValues} setValue={setValue} />)}
+        register={register} schema={schema} control={control} trigger={trigger} getValues={getValues} setValue={setValue} watch={watch} />)}
       <div className="d-flex flex-row justify-content-end">
         <button className="btn btn-danger" type="button" onClick={() => reset()}>Annuler</button>
         <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
@@ -76,9 +78,8 @@ export const Form = ({ schema, flow, value, onChange }) => {
   )
 }
 
-const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue }) => {
+const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue, watch }) => {
 
-  // console.debug({ errors })
   if (entry && typeof entry === 'object') {
     const errored = entry.flow.some(step => !!errors[step])
     return (
@@ -86,6 +87,23 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
         {entry.flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} />)}
       </Collapse>
     )
+  }
+
+  const visibleStep = step && option(step.visible)
+    .map(visible => {
+      switch (typeof visible) {
+        case 'object':
+          const value = watch(step.visible.ref);
+          return option(step.visible.test).map(test => test(value)).getOrElse(value)
+        case 'boolean':
+          return visible;
+        default:
+          return true;
+      }
+    })
+    .getOrElse(true)
+  if (!visibleStep) {
+    return null;
   }
 
   switch (step.type) {
@@ -141,7 +159,6 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                       // value={field.value}
                       possibleValues={step.options}
                       {...step}
-                    //todo: faut que fetch soit entiereemnt remplacable
                     />
                     {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
                   </div>

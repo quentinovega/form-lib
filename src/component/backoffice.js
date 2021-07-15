@@ -94,6 +94,19 @@ export const BackOffice = (props) => {
       }
 
     },
+
+    species: {
+      type: Types.string,
+      visible: { ref: 'human', test: is => !is },
+      format: 'select',
+      label: 'Espèce du perso.',
+      help: "l'espece du perso personnage car non humain",
+      options: ["elf", "orc", "semi-dragon", "wererat"],
+      constraints: {
+        // required: constraints.required("l'espece est obligatoire"), //todo: WHEN ==> required just if not human
+      }
+
+    },
     weapons: {
       type: Types.object,
       format: 'select',
@@ -122,6 +135,7 @@ export const BackOffice = (props) => {
         // min: constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
         length: constraints.length(2, '2 armes obligatoire'),
         test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
+        //todo: tester when en fonction de l'age
       },
       
       // createOption: true,
@@ -176,6 +190,7 @@ export const BackOffice = (props) => {
     },
     'bio',
     'human',
+    'species',
     'genre',
     'weapons',
     'birthday',
