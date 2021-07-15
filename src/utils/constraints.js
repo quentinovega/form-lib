@@ -2,9 +2,9 @@ export const required = (message = "Ce champ est requis") => ({ message })
 
 //string
 export const url = (message = "not an url") => ({ message })
-//todo: matches
-//todo: email
-//todo: uuid
+export const email = (message = "not an email") => ({ message })
+export const uuid = (message = "not an uuid") => ({ message })
+export const matches = (regexp = /.*/, message = "not an email") => ({ regexp, message })
 
 //number
 export const min = (value, message = "trop petit") => ({ value, message })
@@ -17,7 +17,6 @@ export const moreThan = (ref, message = `plus petit que ${ref}`) => ({ ref, mess
 
 //array
 export const length = (value, message = `la taille doit etre ${value}`) => ({ value, message })
-//todo: implement array().of() ???
 
 //mixed
 export const test = (ref, message = 'test faile', test) => ({ref, message, test})
