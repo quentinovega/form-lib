@@ -12,7 +12,7 @@ type ArrayResolverConstraints = {
 
 export class ArrayResolver extends BaseResolver {
   constructor(constraints: BaseResolverConstraints & ArrayResolverConstraints) {
-    super(constraints)
+    super('array', constraints)
 
     this.min = constraints.min
     this.max = constraints.max

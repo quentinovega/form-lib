@@ -13,7 +13,7 @@ type StringResolverConstraints = {
 
 export class StringResolver extends BaseResolver {
   constructor(constraints: BaseResolverConstraints & StringResolverConstraints) {
-    super(constraints)
+    super('string', constraints)
 
     this.min = constraints.min
     this.max = constraints.max

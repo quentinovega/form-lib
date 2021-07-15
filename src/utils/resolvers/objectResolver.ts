@@ -9,7 +9,7 @@ type ObjectResolverConstraints = {
 
 export class ObjectResolver extends BaseResolver {
   constructor(constraints: BaseResolverConstraints & ObjectResolverConstraints) {
-    super(constraints)
+    super('object', constraints)
 
     this.shape = constraints.shape
   }

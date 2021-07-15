@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form } from '../utils/form'
 import * as constraints from '../utils/constraints';
 import { Types } from '../utils/types';
@@ -7,11 +7,14 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 export const BackOffice = (props) => {
 
+  const [user, setUser] = useState(undefined)
+
   const formSchema = {
     game: {
       type: Types.string,
       label: 'game',
       placeholder: 'url du game',
+      defaultValue: 'https://foo.bar',
       constraints: {
         url: constraints.url()
       }
@@ -49,7 +52,7 @@ export const BackOffice = (props) => {
       constraints: {
         required: constraints.required("l'age du pere est obligatoire"),
         min: { value: 18, message: "il doit etre majeur" },
-        max: constraints.max(130, "il doit etre en vie"),
+        max: constraints.max(1000, "il doit etre en vie"),
         integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
         // positive: positive("un age negatif ? il est pas né ton perso ????"),
       }
@@ -80,7 +83,7 @@ export const BackOffice = (props) => {
       type: Types.bool, //todo: cool si on peu chainer des input ==> input pour le nom de l'espece du perso (option visible peut etre avec une fonction)
       label: 'is human ?',
       help: "le personnage est il humain",
-      defaultValue: true
+      defaultValue: false
     },
     genre: {
       type: Types.string,
@@ -103,6 +106,11 @@ export const BackOffice = (props) => {
       help: "l'espece du perso personnage car non humain",
       options: ["elf", "orc", "semi-dragon", "wererat"],
       constraints: {
+        when: constraints.when('human', is => !is, {
+          required: constraints.required("l'espece est obligatoire")
+        }, {
+          required: constraints.required("l'espece n'est pas obligatoire")
+        })
         // required: constraints.required("l'espece est obligatoire"), //todo: WHEN ==> required just if not human
       }
 
@@ -137,7 +145,7 @@ export const BackOffice = (props) => {
         test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
         //todo: tester when en fonction de l'age
       },
-      
+
       // createOption: true,
 
     },
@@ -149,6 +157,17 @@ export const BackOffice = (props) => {
         required: constraints.required('required'),
         max: constraints.max(new Date(), 'pas de naissance dans le futur'),
       },
+    },
+    city: {
+      type: Types.string,
+      format: 'select',
+      label: 'ville',
+      help: 'Ville de résidence',
+      transformer: (value) => ({label: value.label, value: value.id}),
+      options: [{label: 'Neo-Tokyo', id: 1}, {label: 'Asgard', id: 2}, {label: 'Fondcombe', id: 3}],
+      constraints: {
+        required: constraints.required(`Personne n'habite nulle-part jsuqu'à preuve du contraire`)
+      }
     },
     abilities: {
       type: Types.string,
@@ -172,14 +191,9 @@ export const BackOffice = (props) => {
 
   const formFlow = [
     'game',
-    {
-      label: 'personnage',
-      flow: [
-        'name',
-        'age'
-      ],
-      collapsed: true
-    },
+    'name',
+    'age',
+    'city',
     {
       label: 'pere du personnage',
       flow: [
@@ -197,16 +211,52 @@ export const BackOffice = (props) => {
     'abilities'
   ];
 
+  const thor = {
+    game: 'https://foo.dev',
+    name: 'Thor',
+    age: 211,
+    city: 2,
+    fatherName: 'Odin',
+    fatherAge: '999',
+    bio: 'Thor odinson...have a hammer',
+    human: true,
+    species: undefined,
+    genre: 'male',
+    weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "Mjolnir", weight: 100, rarity: 'legendary' }],
+    birthday: new Date('August 19, 1975 23:15:30'),
+    abilities: ['Brave', 'Fair', 'Worthy']
+  }
+
+  const loki = {
+    game: 'https://foo.dev',
+    name: 'Loki',
+    age: 100,
+    city: 2,
+    fatherName: 'Odin',
+    fatherAge: '999',
+    bio: 'Loki...don`t trust him ',
+    human: true,
+    species: undefined,
+    genre: 'male',
+    weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
+    birthday: new Date('August 19, 1985 23:15:30'),
+    abilities: ['Vile', 'Unfair', 'Unworthy']
+  }
+
 
   return (
     <div className="container-xxl my-md-4 bd-layout">
       <h1>BaCk OffIcE</h1>
+
+      <button className="btn btn-info" onClick={() => setUser(loki)}>Loki</button>
+      <button className="btn btn-info" onClick={() => setUser(thor)}>Thor</button>
 
       <div>
         <Form
           schema={formSchema}
           flow={formFlow}
           onChange={item => console.log({ item })}
+          value={user}
         />
       </div>
     </div>

@@ -19,7 +19,5 @@ export const moreThan = (ref, message = `plus petit que ${ref}`) => ({ ref, mess
 export const length = (value, message = `la taille doit etre ${value}`) => ({ value, message })
 
 //mixed
-export const test = (ref, message = 'test faile', test) => ({ref, message, test})
-
-
-//todo: custom ??? (exemple : IP)
+export const test = (ref, message = 'test faile', test) => ({ ref, message, test })
+export const when = (ref, test, then, otherwise) => ({ ref, test, then, otherwise })

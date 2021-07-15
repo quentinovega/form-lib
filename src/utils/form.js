@@ -1,4 +1,6 @@
+import React, { useEffect } from 'react'
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { DevTool } from "@hookform/devtools";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
@@ -10,7 +12,7 @@ import { BooleanInput, Collapse, SelectInput } from './inputs';
 import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
 import { option } from '../utils/Option'
 
-const buildSubResolver = (props, key, dependencies) => {
+export const buildSubResolver = (props, key, dependencies) => {
   let resolver;
   const { type, constraints = {} } = props;
   if (props.format === 'array' || props.isMulti) {
@@ -58,14 +60,55 @@ const buildResolver = (schema, dependencies = []) => {
 }
 
 export const Form = ({ schema, flow, value, onChange }) => {
+  //todo: use flow for better defaultValue
+  //todo: build recursively with subSchema
+  const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
+    if (typeof entry.defaultValue !== 'undefined' && entry.defaultValue !== null) {
+      return { ...acc, [key]: entry.defaultValue }
+    }
+    return acc
+  }, {})
 
   const { register, handleSubmit, formState: { errors }, control, reset, watch, trigger, getValues, setValue } = useForm({
-    resolver: yupResolver(buildResolver(schema))
+    resolver: yupResolver(buildResolver(schema)),
+    defaultValues: value || defaultValues
   });
 
-  // console.debug(watch())
+  useEffect(() => {
+    // const flowToValue = (flow) => {
+    //   flow.forEach(entry => {
+    //     if (typeof entry === 'object') {
+    //       console.debug({subFlow: entry.flow})
+    //       flowToValue(entry.flow)
+    //     } else {
+    //       const entryValue = value[entry]
+    //       console.debug({entry, entryValue})
+    //         if (schema[entry].format === 'array') {
+    //           value[entry].forEach((v, i) => {
+    //             console.debug({v, i})
+    //             setValue(`${entry}.${i}`, v)
+    //           })
+    //         } else {
+    //           setValue(entry, value[entry])
+    //         }
+          
+          
+    //     }
+    //   })
+    // }
+
+    if (flow && value) {
+      // flowToValue(flow)
+      reset(value)
+    }
+
+  }, [value])
+
+
+  console.debug(watch())
 
   // console.debug({ errors })
+
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
@@ -130,7 +173,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             <ArrayStep
               entry={entry} step={step} trigger={trigger}
               register={register} control={control} errors={errors}
-              setValue={setValue} values={getValues(entry)} defaultValue={""} //todo: real defaultValue
+              setValue={setValue} values={getValues(entry)}
               component={((props, idx) => {
                 return (
                   <>
@@ -148,7 +191,6 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             <Controller
               name={entry}
               control={control}
-              defaultValue={!!step.defaultValue}
               render={({ field }) => {
                 return (
                   <div className="mb-3">
@@ -156,7 +198,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                     <SelectInput
                       className={classNames({ 'is-invalid': errors[entry] })}
                       onChange={field.onChange}
-                      // value={field.value}
+                      value={field.value}
                       possibleValues={step.options}
                       {...step}
                     />
@@ -219,7 +261,6 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
         <Controller
           name={entry}
           control={control}
-          defaultValue={!!step.defaultValue}
           render={({ field }) => {
             return (
               <div className="form-group">
@@ -311,7 +352,7 @@ const ArrayStep = ({ entry, step, control, trigger, register, errors, component,
         .map((field, idx) => {
           return (
             <div key={field.id} className="d-flex flex-row">
-              {component({ key: field.id, ...register(`${entry}.${idx}`), ...field }, idx)}
+              {component({ key: field.id, ...register(`${entry}.${idx}`), value: values[idx], ...field }, idx)}
               <div className="input-group-append">
                 <button className="btn btn-danger btn-sm" onClick={() => {
                   remove(idx)

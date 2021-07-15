@@ -15,7 +15,7 @@ type BooleanResolverConstraints = {
 
 export class BooleanResolver extends BaseResolver {
   constructor(constraints: BaseResolverConstraints & BooleanResolverConstraints) {
-    super(constraints)
+    super('boolean', constraints)
   }
 
   toResolver(key: string, dependencies: any) {

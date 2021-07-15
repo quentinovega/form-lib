@@ -16,11 +16,29 @@ const valueToSelectoption = (value) => {
 export const SelectInput = (props) => {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState(props.isMulti ? [] : undefined)
-  const [values, setValues] = useState((props.possibleValues || []).map(valueToSelectoption))
+  const [values, setValues] = useState((props.possibleValues || [])
+    .map(v => props.transformer ? props.transformer(v) : v => v)
+    .map(valueToSelectoption))
+
 
   useEffect(() => {
-    //todo: why reload after choose option
-    //todo: nice to have a fucntion to replace our fetch
+    if (props.value) {
+      if (props.isMulti) {
+        const v = option(values)
+          .map(maybeValues => props.value.map(v => {
+            console.debug({maybeValues, v})
+            return maybeValues.find(item => JSON.stringify(item.value) === JSON.stringify(v))}))
+          .getOrElse(props.value.map(valueToSelectoption))
+
+        setValue(v)
+      } else {
+        const v = option(values).map(maybeValues => maybeValues.find(item => item.value === props.value)).getOrElse(valueToSelectoption(props.value))
+        setValue(v)
+      }
+    }
+  }, [props.value, values])
+
+  useEffect(() => {
     if (props.optionsFrom) {
       const cond = option(props.fetchCondition).map(cond => cond()).getOrElse(true);
 

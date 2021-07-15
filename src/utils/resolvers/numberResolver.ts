@@ -15,7 +15,7 @@ type NumberResolverConstraints = {
 
 export class NumberResolver extends BaseResolver {
   constructor(constraints: BaseResolverConstraints & NumberResolverConstraints) {
-    super(constraints)
+    super('number', constraints)
 
     this.min = constraints.min
     this.max = constraints.max

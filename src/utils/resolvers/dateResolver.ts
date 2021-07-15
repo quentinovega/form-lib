@@ -10,7 +10,7 @@ type DateResolverConstraints = {
 
 export class DateResolver extends BaseResolver {
   constructor(constraints: BaseResolverConstraints & DateResolverConstraints) {
-    super(constraints)
+    super('date', constraints)
 
     this.min = constraints.min
     this.max = constraints.max

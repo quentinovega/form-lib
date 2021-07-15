@@ -2,8 +2,10 @@ export interface Constraint {
   value: string | number | Date;
   message: string;
   ref?: string | number;
-  test?: () => boolean;
+  test?: (val: any) => boolean;
   regexp?:RegExp
+  then?: object
+  otherwise?: object
 }
 
 export type BaseResolverConstraints = {
