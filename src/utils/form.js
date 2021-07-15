@@ -62,7 +62,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
     resolver: yupResolver(buildResolver(schema))
   });
 
-  console.debug(watch())
+  // console.debug(watch())
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
@@ -78,7 +78,7 @@ export const Form = ({ schema, flow, value, onChange }) => {
 
 const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue }) => {
 
-console.debug({errors})
+  // console.debug({ errors })
   if (entry && typeof entry === 'object') {
     const errored = entry.flow.some(step => !!errors[step])
     return (
@@ -136,9 +136,9 @@ console.debug({errors})
                   <div className="mb-3">
                     <label className="form-label" htmlFor={entry}>{step.label}</label>
                     <SelectInput
-                      className={classNames('test555555555555', { 'is-invalid': errors[entry] })}
+                      className={classNames({ 'is-invalid': errors[entry] })}
                       onChange={field.onChange}
-                      value={field.value}
+                      // value={field.value}
                       possibleValues={step.options}
                       {...step}
                     //todo: faut que fetch soit entiereemnt remplacable

@@ -2,7 +2,6 @@ import React from 'react';
 import { Form } from '../utils/form'
 import * as constraints from '../utils/constraints';
 import { Types } from '../utils/types';
-import { ref } from '../utils/utils'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 
@@ -101,13 +100,13 @@ export const BackOffice = (props) => {
       isMulti: true,
       label: 'armes',
       help: "les armes du perso personnage",
-      // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
+      optionsFrom: "https://formslibtestoptions.opunmaif.fr",
       // transformer: (value) => ({label: value.weight, value: value.label}),
-      options: [
-        { label: "toothpick", weight: 0, rarity: 'common' },
-        { label: "sword", weight: 2, rarity: 'common' }, 
-        { label: "bazooka", weight: 10, rarity: 'epic' },
-        { label: "excalibur", weight: 100, rarity: 'legendary' }],
+      // options: [
+      //   { label: "toothpick", weight: 0, rarity: 'common' },
+      //   { label: "sword", weight: 2, rarity: 'common' }, 
+      //   { label: "bazooka", weight: 10, rarity: 'epic' },
+      //   { label: "excalibur", weight: 100, rarity: 'legendary' }],
       schema: {
         label: {
           type: Types.string,
@@ -177,7 +176,7 @@ export const BackOffice = (props) => {
     },
     'bio',
     'human',
-    // 'genre',
+    'genre',
     'weapons',
     'birthday',
     'abilities'
