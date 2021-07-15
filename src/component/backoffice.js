@@ -101,17 +101,13 @@ export const BackOffice = (props) => {
     species: {
       type: Types.string,
       visible: { ref: 'human', test: is => !is },
-      format: 'select',
       label: 'Espèce du perso.',
       help: "l'espece du perso personnage car non humain",
-      options: ["elf", "orc", "semi-dragon", "wererat"],
       constraints: {
         when: constraints.when('human', is => !is, {
-          required: constraints.required("l'espece est obligatoire")
-        }, {
-          required: constraints.required("l'espece n'est pas obligatoire")
+          required: constraints.required("l'espece est requise si non-humain"),
+          // oneOf: constraints.oneOf(["elf", "orc", "semi-dragon", "wererat"], "l'espece doit etre particuliere")
         })
-        // required: constraints.required("l'espece est obligatoire"), //todo: WHEN ==> required just if not human
       }
 
     },
@@ -132,7 +128,7 @@ export const BackOffice = (props) => {
         label: {
           type: Types.string,
         },
-        waight: {
+        weight: {
           type: Types.number
         },
         rarity: {
@@ -142,7 +138,7 @@ export const BackOffice = (props) => {
       constraints: {
         // min: constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
         length: constraints.length(2, '2 armes obligatoire'),
-        test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
+        test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100) //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200 
         //todo: tester when en fonction de l'age
       },
 
@@ -178,11 +174,11 @@ export const BackOffice = (props) => {
         type: Types.string,
         constraints: {
           required: constraints.required('required'),
-          min: constraints.min(5, 'au moins 5 lettres'),
+          min: constraints.min(4, 'au moins 4 lettres'),
         }
       },
       constraints: {
-        length: constraints.length(2, '2 abilities obligatoire'),
+        length: constraints.length(3, '3 abilities obligatoire'),
         max: constraints.max(10, "max 10")
         // moreThan: constraints.length(2, '2 abilities min obligatoire')
       },

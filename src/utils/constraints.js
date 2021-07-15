@@ -21,3 +21,4 @@ export const length = (value, message = `la taille doit etre ${value}`) => ({ va
 //mixed
 export const test = (ref, message = 'test faile', test) => ({ ref, message, test })
 export const when = (ref, test, then, otherwise) => ({ ref, test, then, otherwise })
+export const oneOf = (arrayOfValues, message) => ({ arrayOfValues, message })

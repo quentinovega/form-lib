@@ -10,12 +10,14 @@ export class BaseResolver {
     this.required = constraints.required
     this.test = constraints.test
     this.when = constraints.when
+    this.oneOf = constraints.oneOf
   }
   type: string
 
   required?: Constraint;
   test?: Constraint;
   when?: Constraint;
+  oneOf?: Constraint;
 
   toBaseResolver(yupResolver: yup.AnySchema, key: string, dependencies: any) {
     let baseResolver = yupResolver;
@@ -27,12 +29,17 @@ export class BaseResolver {
       dependencies.push([key , this.test.ref])
     }
 
+    if (this.oneOf) {
+      baseResolver = baseResolver.oneOf(this.oneOf.arrayOfValues || [], this.oneOf.message)
+    }
+
     if (!!this.when && this.when.ref) {
-      baseResolver = baseResolver.when(String(this.when.ref), {
-        is: (val: any) => this.when?.test && this.when?.test(val),
+      baseResolver = baseResolver.when([String(this.when.ref)], {
+        is: (val: any) => this.when?.test && this.when.test(val),
         then: buildSubResolver({type: this.type, constraints: this.when.then}, key, dependencies),
-        otherwise: buildSubResolver({ type: this.type, constraints: this.when.then }, key, dependencies)
+        otherwise: buildSubResolver({ type: this.type, constraints: this.when.otherwise }, key, dependencies)
       })
+      dependencies.push([key, this.when.ref])
     }
     
     return baseResolver

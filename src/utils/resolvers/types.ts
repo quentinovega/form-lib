@@ -1,5 +1,6 @@
 export interface Constraint {
-  value: string | number | Date;
+  value: string | number | Date ;
+  arrayOfValues?: any[]
   message: string;
   ref?: string | number;
   test?: (val: any) => boolean;
@@ -12,4 +13,5 @@ export type BaseResolverConstraints = {
   required?: Constraint;
   test?: Constraint;
   when?: Constraint;
+  oneOf?: Constraint;
 }

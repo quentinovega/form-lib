@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { DevTool } from "@hookform/devtools";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import classNames from 'classnames';
@@ -75,39 +74,15 @@ export const Form = ({ schema, flow, value, onChange }) => {
   });
 
   useEffect(() => {
-    // const flowToValue = (flow) => {
-    //   flow.forEach(entry => {
-    //     if (typeof entry === 'object') {
-    //       console.debug({subFlow: entry.flow})
-    //       flowToValue(entry.flow)
-    //     } else {
-    //       const entryValue = value[entry]
-    //       console.debug({entry, entryValue})
-    //         if (schema[entry].format === 'array') {
-    //           value[entry].forEach((v, i) => {
-    //             console.debug({v, i})
-    //             setValue(`${entry}.${i}`, v)
-    //           })
-    //         } else {
-    //           setValue(entry, value[entry])
-    //         }
-          
-          
-    //     }
-    //   })
-    // }
-
     if (flow && value) {
-      // flowToValue(flow)
       reset(value)
     }
-
   }, [value])
 
 
-  console.debug(watch())
+  // console.debug(watch())
 
-  // console.debug({ errors })
+  console.debug({ errors })
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
