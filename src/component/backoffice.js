@@ -31,7 +31,7 @@ export const BackOffice = (props) => {
         required: { message: "le nom est obligatoire" },
       },
       props: {}, //todo: possibilité de merge les props,
-      render: () => { } //todo: possibilité de donner un composant pour dessiner un truc spé
+      render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)}/>
     },
     fatherName: {
       type: Types.string,
@@ -84,7 +84,23 @@ export const BackOffice = (props) => {
       type: Types.bool, //todo: cool si on peu chainer des input ==> input pour le nom de l'espece du perso (option visible peut etre avec une fonction)
       label: 'is human ?',
       help: "le personnage est il humain",
-      defaultValue: false
+      defaultValue: false,
+      // render: props => <div>
+      //   <div className="form-check">
+      //     <input className="form-check-input" type="radio" name="exampleRadios" id="isHuman" value={'true'} checked={!!props.value ? 'checked' : null}
+      //       onChange={() => props.onChange(true)} />
+      //     <label className ="form-check-label" htmlFor="isHuman">
+      //     Oui
+      //     </label>
+      //   </div>
+      //   <div className="form-check">
+      //     <input className="form-check-input" type="radio" name="exampleRadios" id="isNotHuman" value={'false'} checked={!!props.value ? null : 'checked'}
+      //       onChange={() => props.onChange(false)}/>
+      //     <label className="form-check-label" htmlFor="isNotHuman">
+      //     Non
+      //     </label>
+      //   </div>
+      // </div>
     },
     genre: {
       type: Types.string,
@@ -153,7 +169,7 @@ export const BackOffice = (props) => {
       constraints: {
         required: constraints.required('required'),
         max: constraints.max(new Date(), 'pas de naissance dans le futur'),
-      },
+      }
     },
     city: {
       type: Types.string,
@@ -183,6 +199,12 @@ export const BackOffice = (props) => {
         max: constraints.max(10, "max 10")
         // moreThan: constraints.length(2, '2 abilities min obligatoire')
       },
+      render: (props) => {
+        console.debug({error: props.error})
+      return  <div className="d-flex">
+        <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
+        {props.error && <div style={{color: 'tomato'}}>{props.error.message}</div>}
+        </div>}
     }
   }
 
