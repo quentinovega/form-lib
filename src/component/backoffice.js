@@ -23,6 +23,7 @@ export const BackOffice = (props) => {
       type: Types.string,
       label: 'name',
       placeholder: 'Nom de ton perso',
+      help: 'nom de ton personnage',
       className: "col-6",
       style: { color: 'red' },
 
@@ -239,15 +240,15 @@ export const BackOffice = (props) => {
     abilities: ['Vile', 'Unfair', 'Unworthy']
   }
 
-  const Wrapper = ({ entry, label, error, children}) => {
-    return (
-      <div className="d-flex flex-row">
-        <label className="form-label" htmlFor={entry}>{label}</label>
-        {children}
-        {error && <div className="invalid-feedback">{error.message}</div>}
-      </div>
-    )
-  }
+  // const Wrapper = ({ entry, label, error, children}) => {
+  //   return (
+  //     <div className="d-flex flex-row">
+  //       <label className="form-label" htmlFor={entry}>{label}</label>
+  //       {children}
+  //       {error && <div className="invalid-feedback">{error.message}</div>}
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="container-xxl my-md-4 bd-layout">

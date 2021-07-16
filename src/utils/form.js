@@ -5,6 +5,9 @@ import * as yup from "yup";
 import classNames from 'classnames';
 import { Types } from './types';
 import { DatePicker } from 'react-rainbow-components';
+import ReactToolTip from 'react-tooltip';
+import { HelpCircle } from 'react-feather';
+import { v4 as uuid } from 'uuid';
 
 import { BooleanInput, Collapse, SelectInput } from './inputs';
 
@@ -58,14 +61,25 @@ const buildResolver = (schema, dependencies = []) => {
   return yup.object().shape(shape, dependencies);
 }
 
-const BasicWrapper = ({entry, label, error, children, render}) => {
+const BasicWrapper = ({ entry, label, error, help, children, render }) => {
+  const id = uuid();
+
   if (render) {
-    return render({ entry, label, error, children })
+    return render({ entry, label, error, help, children })
   }
 
   return (
-    <div className="form-group">
-      <label className="form-label" htmlFor={entry}>{label}</label>
+    <div className="form-group mt-3">
+      <label className="form-label d-flex align-content-center" htmlFor={entry}>
+        <span className="mr-2">{label}</span>
+        {help && <>
+          <ReactToolTip html={true} place={'bottom'} id={id} />
+          <span data-html={true} data-tip={help} data-for={id}>
+            <HelpCircle style={{ color: 'gray', width: 17, marginLeft: '.5rem', cursor: 'help' }} />
+          </span>
+        </>}
+      </label>
+
       {children}
       {error && <div className="invalid-feedback">{error.message}</div>}
     </div>
@@ -101,7 +115,7 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
-        register={register} schema={schema} control={control} trigger={trigger} getValues={getValues} 
+        register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
         setValue={setValue} watch={watch} inputWrapper={inputWrapper} />)}
       <div className="d-flex flex-row justify-content-end">
         <button className="btn btn-danger" type="button" onClick={() => reset({})}>Annuler</button>
@@ -144,8 +158,8 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
       switch (step.format) {
         case 'text':
           return (
-            <div className="form-group">
-              <label className="form-label" htmlFor={entry}>{entry}</label>
+
+            <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <textarea
                 type="text" id={entry}
                 className={classNames("form-control", { 'is-invalid': errors[entry] })}
@@ -154,27 +168,30 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                 {...register(entry)}
                 {...step.props} />
               {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-            </div>
+            </BasicWrapper>
           );
         case 'code': //todo
         case 'markdown': //todo
         case 'array':
           return (
-            <ArrayStep
-              entry={entry} step={step} trigger={trigger}
-              register={register} control={control} errors={errors}
-              setValue={setValue} values={getValues(entry)}
-              component={((props, idx) => {
-                return (
-                  <>
-                    <input
-                      type="text"
-                      className={classNames("form-control", { 'is-invalid': errors[entry] && errors[entry][idx] })}
-                      placeholder={step.placeholder} {...props} />
-                    {errors[entry] && errors[entry][idx] && <div className="invalid-feedback">{errors[entry][idx].message}</div>}
-                  </>
-                )
-              })} />
+
+            <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+              <ArrayStep
+                entry={entry} step={step} trigger={trigger}
+                register={register} control={control} errors={errors}
+                setValue={setValue} values={getValues(entry)}
+                component={((props, idx) => {
+                  return (
+                    <>
+                      <input
+                        type="text"
+                        className={classNames("form-control", { 'is-invalid': errors[entry] && errors[entry][idx] })}
+                        placeholder={step.placeholder} {...props} />
+                      {errors[entry] && errors[entry][idx] && <div className="invalid-feedback">{errors[entry][idx].message}</div>}
+                    </>
+                  )
+                })} />
+            </BasicWrapper>
           )
         case 'select':
           return (
@@ -183,8 +200,8 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               control={control}
               render={({ field }) => {
                 return (
-                  <div className="mb-3">
-                    <label className="form-label" htmlFor={entry}>{step.label}</label>
+
+                  <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                     <SelectInput
                       className={classNames({ 'is-invalid': errors[entry] })}
                       onChange={field.onChange}
@@ -193,14 +210,14 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                       {...step}
                     />
                     {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-                  </div>
+                  </BasicWrapper>
                 )
               }}
             />
           )
         default:
           return (
-            <BasicWrapper entry={entry} error={errors[entry]} label={entry} render={inputWrapper}>
+            <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <input
                 type="text" id={entry}
                 className={classNames("form-control", { 'is-invalid': errors[entry] })}
@@ -215,24 +232,27 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
       switch (step.format) {
         case 'array':
           return (
-            <ArrayStep
-              entry={entry} step={step} trigger={trigger}
-              register={register} control={control} errors={errors}
-              values={getValues(entry)} defaultValue={0} //todo: real default value
-              component={(props => {
-                return (
-                  <input
-                    type="number"
-                    className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                    placeholder={step.placeholder} {...props} />
-                )
-              })} />
+
+            <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+              <ArrayStep
+                entry={entry} step={step} trigger={trigger}
+                register={register} control={control} errors={errors}
+                values={getValues(entry)} defaultValue={0} //todo: real default value
+                component={(props => {
+                  return (
+                    <input
+                      type="number"
+                      className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                      placeholder={step.placeholder} {...props} />
+                  )
+                })} />
+            </BasicWrapper>
           )
 
         default:
           return (
-            <div className="form-group">
-              <label className="form-label" htmlFor={entry}>{entry}</label>
+
+            <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <input
                 type="number" id={entry}
                 className={classNames("form-control", { 'is-invalid': errors[entry] })}
@@ -240,7 +260,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                 placeholder={step.placeholder}
                 {...register(entry)} />
               {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-            </div>
+            </BasicWrapper>
           );
       }
 
@@ -251,15 +271,15 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
           control={control}
           render={({ field }) => {
             return (
-              <div className="form-group">
-                <label className="form-label" htmlFor={entry}>{step.label}</label>
+
+              <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                 <BooleanInput
                   className={classNames({ 'is-invalid': errors[entry] })}
                   onChange={field.onChange}
                   value={field.value}
                 />
                 {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-              </div>
+              </BasicWrapper>
             )
           }}
         />
@@ -275,18 +295,17 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               defaultValue={step.defaultValue}
               render={({ field }) => {
                 return (
-                  <div className="form-group">
-                    <label className="form-label" htmlFor={entry}>{step.label}</label>
+
+                  <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                     <SelectInput
                       className={classNames({ 'is-invalid': errors[entry] })}
                       onChange={field.onChange}
                       value={field.value}
                       possibleValues={step.options}
                       {...step}
-                    //todo: faut que fetch soit entiereemnt remplacable
                     />
                     {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-                  </div>
+                  </BasicWrapper>
                 )
               }}
             />
@@ -303,8 +322,8 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
           render={({ field }) => {
 
             return (
-              <div className="form-group">
-                <label className="form-label" htmlFor={entry}>{step.label}</label>
+
+              <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                 <DatePicker
                   id="datePicker-1"
                   className={classNames({ 'is-invalid': errors[entry] })}
@@ -314,7 +333,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                 // locale={state.locale.name}
                 />
                 {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-              </div>
+              </BasicWrapper>
             )
           }}
         />
@@ -334,8 +353,7 @@ const ArrayStep = ({ entry, step, control, trigger, register, errors, component,
   });
 
   return (
-    <div className="form-group">
-      <label htmlFor={entry}>{step.label}</label>
+    <>
       {fields
         .map((field, idx) => {
           return (
@@ -357,6 +375,6 @@ const ArrayStep = ({ entry, step, control, trigger, register, errors, component,
         }} value="Add" />
         {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
       </div>
-    </div>
+    </>
   )
 }

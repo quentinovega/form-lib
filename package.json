@@ -23,6 +23,7 @@
     "react-rainbow-components": "1.26.0",
     "react-scripts": "4.0.3",
     "react-select": "4.3.1",
+    "react-tooltip": "4.2.21",
     "typescript": "^4.3.5",
     "uuid": "8.3.2",
     "web-vitals": "^1.0.1",
