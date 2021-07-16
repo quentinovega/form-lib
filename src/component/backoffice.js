@@ -239,6 +239,15 @@ export const BackOffice = (props) => {
     abilities: ['Vile', 'Unfair', 'Unworthy']
   }
 
+  const Wrapper = ({ entry, label, error, children}) => {
+    return (
+      <div className="d-flex flex-row">
+        <label className="form-label" htmlFor={entry}>{label}</label>
+        {children}
+        {error && <div className="invalid-feedback">{error.message}</div>}
+      </div>
+    )
+  }
 
   return (
     <div className="container-xxl my-md-4 bd-layout">
@@ -253,6 +262,7 @@ export const BackOffice = (props) => {
           flow={formFlow}
           onChange={item => console.log({ item })}
           value={user}
+          // inputWrapper={Wrapper}
         />
       </div>
     </div>

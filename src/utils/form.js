@@ -58,7 +58,21 @@ const buildResolver = (schema, dependencies = []) => {
   return yup.object().shape(shape, dependencies);
 }
 
-export const Form = ({ schema, flow, value, onChange }) => {
+const BasicWrapper = ({entry, label, error, children, render}) => {
+  if (render) {
+    return render({ entry, label, error, children })
+  }
+
+  return (
+    <div className="form-group">
+      <label className="form-label" htmlFor={entry}>{label}</label>
+      {children}
+      {error && <div className="invalid-feedback">{error.message}</div>}
+    </div>
+  )
+}
+
+export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
   //todo: use flow for better defaultValue
   //todo: build recursively with subSchema
   const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
@@ -87,16 +101,17 @@ export const Form = ({ schema, flow, value, onChange }) => {
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
-        register={register} schema={schema} control={control} trigger={trigger} getValues={getValues} setValue={setValue} watch={watch} />)}
+        register={register} schema={schema} control={control} trigger={trigger} getValues={getValues} 
+        setValue={setValue} watch={watch} inputWrapper={inputWrapper} />)}
       <div className="d-flex flex-row justify-content-end">
-        <button className="btn btn-danger" type="button" onClick={() => reset()}>Annuler</button>
+        <button className="btn btn-danger" type="button" onClick={() => reset({})}>Annuler</button>
         <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
       </div>
     </form>
   )
 }
 
-const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue, watch }) => {
+const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue, watch, inputWrapper }) => {
 
   if (entry && typeof entry === 'object') {
     const errored = entry.flow.some(step => !!errors[step])
@@ -185,16 +200,14 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
           )
         default:
           return (
-            <div className="mb-3">
-              <label className="form-label" htmlFor={entry}>{entry}</label>
+            <BasicWrapper entry={entry} error={errors[entry]} label={entry} render={inputWrapper}>
               <input
                 type="text" id={entry}
                 className={classNames("form-control", { 'is-invalid': errors[entry] })}
                 name={entry}
                 placeholder={step.placeholder}
                 {...register(entry)} />
-              {errors[entry] && <div className="invalid-feedback">{errors[entry].message}</div>}
-            </div>
+            </BasicWrapper>
           );
       }
 
