@@ -105,12 +105,10 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
     if (flow && value) {
       reset(value)
     }
-  }, [value])
+  }, [value, flow, reset])
 
 
   // console.debug(watch())
-
-  console.debug({ errors })
 
   return (
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>

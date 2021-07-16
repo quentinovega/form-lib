@@ -22,21 +22,19 @@ export const SelectInput = (props) => {
 
 
   useEffect(() => {
-    if (props.value) {
+    //todo: better code
       if (props.isMulti) {
         const v = option(values)
-          .map(maybeValues => props.value.map(v => {
-            console.debug({maybeValues, v})
+          .map(maybeValues => (props.value || []).map(v => {
             return maybeValues.find(item => JSON.stringify(item.value) === JSON.stringify(v))}))
-          .getOrElse(props.value.map(valueToSelectoption))
+          .getOrElse((props.value || []).map(valueToSelectoption))
 
         setValue(v)
       } else {
         const v = option(values).map(maybeValues => maybeValues.find(item => item.value === props.value)).getOrElse(valueToSelectoption(props.value))
         setValue(v)
       }
-    }
-  }, [props.value, values])
+  }, [props.value, values, props.isMulti])
 
   useEffect(() => {
     if (props.optionsFrom) {
