@@ -9,7 +9,7 @@ import ReactToolTip from 'react-tooltip';
 import { HelpCircle } from 'react-feather';
 import { v4 as uuid } from 'uuid';
 
-import { BooleanInput, Collapse, SelectInput } from './inputs';
+import { BooleanInput, Collapse, SelectInput, ObjectInput } from './inputs';
 
 import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
 import { option } from '../utils/Option'
@@ -99,12 +99,13 @@ const CustomizableInput = props => {
 export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
   //todo: use flow for better defaultValue
   //todo: build recursively with subSchema
-  const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
-    if (typeof entry.defaultValue !== 'undefined' && entry.defaultValue !== null) {
-      return { ...acc, [key]: entry.defaultValue }
-    }
-    return acc
-  }, {})
+  // const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
+  //   if (typeof entry.defaultValue !== 'undefined' && entry.defaultValue !== null) {
+  //     return { ...acc, [key]: entry.defaultValue }
+  //   }
+  //   return acc
+  // }, {})
+  const defaultValues = {}
 
   const { register, handleSubmit, formState: { errors }, control, reset, watch, trigger, getValues, setValue } = useForm({
     resolver: yupResolver(buildResolver(schema)),
@@ -126,7 +127,7 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
         register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
         setValue={setValue} watch={watch} inputWrapper={inputWrapper} />)}
       <div className="d-flex flex-row justify-content-end">
-        <button className="btn btn-danger" type="button" onClick={() => reset({})}>Annuler</button>
+        <button className="btn btn-danger" type="button" onClick={() => reset(defaultValues)}>Annuler</button>
         <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
       </div>
     </form>
@@ -328,8 +329,28 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             />
           )
         default:
-          //todo
-          return null;
+          return (
+            <Controller
+              name={entry}
+              control={control}
+              defaultValue={step.defaultValue}
+              render={({ field }) => {
+                return (
+                  <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+                    <CustomizableInput render={step.render} field={field} error={errors[entry]}>
+                      <ObjectInput
+                        className={classNames({ 'is-invalid': errors[entry] })}
+                        onChange={field.onChange}
+                        value={field.value}
+                        possibleValues={step.options}
+                        {...step}
+                      />
+                    </CustomizableInput>
+                  </BasicWrapper>
+                )
+              }}
+            />
+          )
       }
     case Types.date:
       return (

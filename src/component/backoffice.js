@@ -204,6 +204,22 @@ export const BackOffice = (props) => {
         <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
         {props.error && <div style={{color: 'tomato'}}>{props.error.message}</div>}
         </div>}
+    },
+    spells: {
+      type: Types.object,
+      label: 'incantations',
+      help: 'Incantation sous form d\'objet {nom, puissance (*/100)} max opuissnce total = 100',
+      defaultKeyValue: {'spellName': 50},
+      // defaultValue: {
+      //   ice: '',
+      //   fire: '',
+      //   air: '',
+      //   lightning: ''
+      // },
+      constraints: {
+        required: constraints.required('incancantation requises'),
+        test: constraints.test("power", 'pas plus de 100 de pouvoir', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) <= 100)
+      }
     }
   }
 
@@ -226,7 +242,8 @@ export const BackOffice = (props) => {
     'genre',
     'weapons',
     'birthday',
-    'abilities'
+    'abilities',
+    'spells'
   ];
 
   const thor = {
@@ -242,7 +259,8 @@ export const BackOffice = (props) => {
     genre: 'male',
     weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "Mjolnir", weight: 100, rarity: 'legendary' }],
     birthday: new Date('August 19, 1975 23:15:30'),
-    abilities: ['Brave', 'Fair', 'Worthy']
+    abilities: ['Brave', 'Fair', 'Worthy'],
+    spells: {linghtningBolt: 100}
   }
 
   const loki = {
@@ -258,7 +276,8 @@ export const BackOffice = (props) => {
     genre: 'male',
     weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
     birthday: new Date('August 19, 1985 23:15:30'),
-    abilities: ['Vile', 'Unfair', 'Unworthy']
+    abilities: ['Vile', 'Unfair', 'Unworthy'],
+    spells: { fakeSnake: 10, hypnosis: 70, realityChanging: 20}
   }
 
   // const Wrapper = ({ entry, label, error, children}) => {

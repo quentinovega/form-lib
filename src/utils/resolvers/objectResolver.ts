@@ -5,6 +5,7 @@ import { BaseResolver } from './baseResolver';
 
 type ObjectResolverConstraints = {
   shape?: any
+  noUnknown ?: Constraint
 }
 
 export class ObjectResolver extends BaseResolver {
@@ -12,13 +13,16 @@ export class ObjectResolver extends BaseResolver {
     super('object', constraints)
 
     this.shape = constraints.shape
+    this.noUnknown = constraints.noUnknown
   }
 
   shape: Constraint
+  noUnknown?: Constraint
 
   toResolver(key: string, dependencies: any) {
-    let resolver = yup.object();
+    let resolver = yup.object()
 
     return super.toBaseResolver(resolver, key, dependencies)
+      .test('test', 'no empty key allowed', v => Object.keys(v).every(k => k !== ''))
   }
 }
