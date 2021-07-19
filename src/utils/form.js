@@ -139,7 +139,9 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
     const errored = entry.flow.some(step => !!errors[step])
     return (
       <Collapse label={entry.label} collapsed={entry.collapsed} errored={errored}>
-        {entry.flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors} register={register} />)}
+        {entry.flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
+          register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
+          setValue={setValue} watch={watch} inputWrapper={inputWrapper} />)}
       </Collapse>
     )
   }
@@ -188,7 +190,6 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                 register={register} control={control} errors={errors}
                 setValue={setValue} values={getValues(entry)}
                 component={((props, idx) => {
-                  console.debug({ errors, error: errors[entry] && errors[entry][idx]})
                   return (
                     <CustomizableInput render={step.render} field={{ value: getValues(`${entry}.${idx}`), onChange: v => setValue(`${entry}.${idx}`, v, { shouldValidate: true }) }} error={errors[entry] && errors[entry][idx]}>
                       <>

@@ -6,7 +6,6 @@ export const Types = {
   string: 'string',
   number: 'number',
   bool: 'bool',
-  date: 'date',  //todo
+  date: 'date',
   object: 'object',
-  // arrayForm: 'arrayform' //todo
 }

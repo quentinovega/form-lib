@@ -200,7 +200,6 @@ export const BackOffice = (props) => {
         // moreThan: constraints.length(2, '2 abilities min obligatoire')
       },
       render: (props) => {
-        console.debug({error: props.error})
       return  <div className="d-flex">
         <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
         {props.error && <div style={{color: 'tomato'}}>{props.error.message}</div>}
