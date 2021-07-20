@@ -12,13 +12,14 @@ export const BackOffice = (props) => {
   const formSchema = {
     game: {
       type: Types.string,
+      disabled: true,
       // format: 'password',
       label: 'game',
       placeholder: 'url du game',
       defaultValue: 'https://foo.bar',
       constraints: {
         url: constraints.url()
-      }
+      },
     },
     name: {
       type: Types.string,
@@ -31,7 +32,6 @@ export const BackOffice = (props) => {
       constraints: {
         required: { message: "le nom est obligatoire" },
       },
-      props: {}, //todo: possibilité de merge les props,
       render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)}/>
     },
     fatherName: {
@@ -72,7 +72,8 @@ export const BackOffice = (props) => {
       }
     },
     bio: {
-      type: Types.text,
+      type: Types.string,
+      format: 'text',
       label: 'biographie',
       placeholder: 'raconte ton histoire',
       help: "bio du personnage",
@@ -225,6 +226,7 @@ export const BackOffice = (props) => {
   }
 
   const formFlow = [
+    'bio',
     'game',
     'name',
     'age',
@@ -237,7 +239,6 @@ export const BackOffice = (props) => {
       ],
       collapsed: true
     },
-    'bio',
     'human',
     'species',
     'genre',

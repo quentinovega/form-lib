@@ -175,10 +175,11 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                 <textarea
                   type="text" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                  disabled={step.disabled ? 'disabled' : null}
+                  {...step.props}
                   name={entry}
                   placeholder={step.placeholder}
-                  {...register(entry)}
-                  {...step.props} />
+                  {...register(entry)} />
               </CustomizableInput>
             </BasicWrapper>
           );
@@ -196,7 +197,9 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                     <CustomizableInput render={step.render} field={{ value: getValues(`${entry}.${idx}`), onChange: v => setValue(`${entry}.${idx}`, v, { shouldValidate: true }) }} error={errors[entry] && errors[entry][idx]}>
                       <>
                         <input
+                          {...step.props}
                           type="text"
+                          disabled={step.disabled ? 'disabled' : null}
                           className={classNames("form-control", { 'is-invalid': errors[entry] && errors[entry][idx] })}
                           placeholder={step.placeholder} {...props} />
                         {errors[entry] && errors[entry][idx] && <div className="invalid-feedback">{errors[entry][idx].message}</div>}
@@ -216,7 +219,9 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                   <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                     <CustomizableInput render={step.render} field={field} error={errors[entry]}>
                       <SelectInput
+                        {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
+                        disabled={step.disabled ? 'disabled' : null}
                         onChange={field.onChange}
                         value={field.value}
                         possibleValues={step.options}
@@ -233,8 +238,10 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <CustomizableInput render={step.render} field={{ value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
                 <input
+                  {...step.props}
                   type="password" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                  disabled={step.disabled ? 'disabled' : null}
                   name={entry}
                   placeholder={step.placeholder}
                   {...register(entry)} />
@@ -246,8 +253,10 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <CustomizableInput render={step.render} field={{ value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
                 <input
+                  {...step.props}
                   type="text" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                  disabled={step.disabled ? 'disabled' : null}
                   name={entry}
                   placeholder={step.placeholder}
                   {...register(entry)} />
@@ -270,8 +279,10 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                     <CustomizableInput render={step.render} field={{ value: getValues(`${entry}.${idx}`), onChange: v => setValue(`${entry}.${idx}`, v, { shouldValidate: true }) }} error={errors[entry] && errors[entry][idx]}>
                       <>
                         <input
+                          {...step.props}
                           type="number"
                           className={classNames("form-control", { 'is-invalid': errors[entry] && errors[entry][idx] })}
+                          disabled={step.disabled ? 'disabled' : null}
                           placeholder={step.placeholder} {...props} />
                         {errors[entry] && errors[entry][idx] && <div className="invalid-feedback">{errors[entry][idx].message}</div>}
                       </>
@@ -286,8 +297,10 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <CustomizableInput render={step.render} field={{ value: getValues(entry), onChange: v => setValue(entry, v) }} error={errors[entry]}>
                 <input
+                  {...step.props}
                   type="number" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                  disabled={step.disabled ? 'disabled' : null}
                   name={entry}
                   placeholder={step.placeholder}
                   {...register(entry)} />
@@ -306,7 +319,9 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                 <CustomizableInput render={step.render} field={field} error={errors[entry]}>
                   <BooleanInput
+                    {...step.props}
                     className={classNames({ 'is-invalid': errors[entry] })}
+                    disabled={step.disabled ? 'disabled' : null}
                     onChange={field.onChange}
                     value={field.value}
                   />
@@ -330,7 +345,9 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                   <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                     <CustomizableInput render={step.render} field={field} error={errors[entry]}>
                       <SelectInput
+                        {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
+                        disabled={step.disabled ? 'disabled' : null}
                         onChange={field.onChange}
                         value={field.value}
                         possibleValues={step.options}
@@ -353,7 +370,9 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                   <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                     <CustomizableInput render={step.render} field={field} error={errors[entry]}>
                       <ObjectInput
+                        {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
+                        disabled={step.disabled ? 'disabled' : null}
                         onChange={field.onChange}
                         value={field.value}
                         possibleValues={step.options}
@@ -377,8 +396,10 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
                 <CustomizableInput render={step.render} field={field} error={errors[entry]}>
                   <DatePicker
+                    {...step.props}
                     id="datePicker-1"
                     className={classNames({ 'is-invalid': errors[entry] })}
+                    disabled={step.disabled ? 'disabled' : null}
                     value={field.value}
                     onChange={field.onChange}
                     formatStyle="large"
