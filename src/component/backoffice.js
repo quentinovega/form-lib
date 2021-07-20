@@ -12,6 +12,7 @@ export const BackOffice = (props) => {
   const formSchema = {
     game: {
       type: Types.string,
+      // format: 'password',
       label: 'game',
       placeholder: 'url du game',
       defaultValue: 'https://foo.bar',

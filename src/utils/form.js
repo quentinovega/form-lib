@@ -228,6 +228,19 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               }}
             />
           )
+        case 'password':
+          return (
+            <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+              <CustomizableInput render={step.render} field={{ value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
+                <input
+                  type="password" id={entry}
+                  className={classNames("form-control", { 'is-invalid': errors[entry] })}
+                  name={entry}
+                  placeholder={step.placeholder}
+                  {...register(entry)} />
+              </CustomizableInput>
+            </BasicWrapper>
+          );
         default:
           return (
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
