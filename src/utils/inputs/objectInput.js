@@ -47,7 +47,7 @@ export const ObjectInput = (props) => {
         </button>
       )}
       {values.map((value, idx) => (
-        <div className="d-flex flex-row">
+        <div className="d-flex flex-row" key={idx}>
           <input
             disabled={props.disabled}
             type="text"

@@ -99,13 +99,15 @@ const CustomizableInput = props => {
 export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
   //todo: use flow for better defaultValue
   //todo: build recursively with subSchema
-  // const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
-  //   if (typeof entry.defaultValue !== 'undefined' && entry.defaultValue !== null) {
-  //     return { ...acc, [key]: entry.defaultValue }
-  //   }
-  //   return acc
-  // }, {})
-  const defaultValues = {}
+  const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
+    if (typeof entry.defaultValue !== 'undefined' && entry.defaultValue !== null) {
+      return { ...acc, [key]: entry.defaultValue }
+    }
+    let defaultValue = undefined;
+    if (entry.type === Types.object) { defaultValue = {} }
+    if (entry.format === 'array' || entry.isMulti) { defaultValue = [] }
+    return { ...acc, [key]: defaultValue }
+  }, {})
 
   const { register, handleSubmit, formState: { errors }, control, reset, watch, trigger, getValues, setValue } = useForm({
     resolver: yupResolver(buildResolver(schema)),
@@ -117,7 +119,6 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
       reset(value)
     }
   }, [value, flow, reset])
-
 
   // console.debug(watch())
 

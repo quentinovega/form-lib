@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import { option } from '../Option';
@@ -23,17 +23,17 @@ export const SelectInput = (props) => {
 
   useEffect(() => {
     //todo: better code
-      if (props.isMulti) {
-        const v = option(values)
-          .map(maybeValues => (props.value || []).map(v => {
-            return maybeValues.find(item => JSON.stringify(item.value) === JSON.stringify(v))}))
-          .getOrElse((props.value || []).map(valueToSelectoption))
-
-        setValue(v)
-      } else {
-        const v = option(values).map(maybeValues => maybeValues.find(item => item.value === props.value)).getOrElse(valueToSelectoption(props.value))
-        setValue(v)
-      }
+    if (props.isMulti) {
+      const v = option(values)
+        .map(maybeValues => (props.value || [])
+          .map(v => maybeValues.find(item => JSON.stringify(item.value) === JSON.stringify(v))))
+        .getOrElse(([])
+          .map(valueToSelectoption))
+      setValue(v)
+    } else {
+      const v = option(values).map(maybeValues => maybeValues.find(item => item.value === props.value)).getOrElse(valueToSelectoption(props.value))
+      setValue(v)
+    }
   }, [props.value, values, props.isMulti])
 
   useEffect(() => {
