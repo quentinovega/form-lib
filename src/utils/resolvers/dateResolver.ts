@@ -1,11 +1,12 @@
 
 import * as yup from 'yup';
-import { BaseResolverConstraints, Constraint } from './types';
+import { BaseResolverConstraints } from './baseResolver';
+import * as Constraints from './types';
 import { BaseResolver } from './baseResolver';
 
 type DateResolverConstraints = {
-  min?: Constraint;
-  max?: Constraint;
+  min?: Constraints.DateConstraint;
+  max?: Constraints.DateConstraint;
 }
 
 export class DateResolver extends BaseResolver {
@@ -16,20 +17,12 @@ export class DateResolver extends BaseResolver {
     this.max = constraints.max
   }
 
-  min?: Constraint;
-  max?: Constraint;
+  min?: Constraints.DateConstraint;
+  max?: Constraints.DateConstraint;
 
   toResolver(key: string, dependencies: any) {
     let resolver = yup.date();
 
-
-    // if (props.multi || props.format === 'array') {
-    //   resolver = yup.array().of(yup.number()).ensure()
-    // }
-    // //todo: if option && multi ...
-    // if (required) {
-    //   resolver = resolver.required(required.message)
-    // }
     if (this.min) {
       resolver = resolver.min(this.min.value, this.min.message)
     }

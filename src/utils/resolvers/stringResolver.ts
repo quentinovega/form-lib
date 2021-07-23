@@ -1,14 +1,15 @@
 import * as yup from 'yup';
-import { BaseResolverConstraints, Constraint } from './types';
+import { BaseResolverConstraints } from './baseResolver';
+import * as Constraint from './types';
 import { BaseResolver } from './baseResolver';
 
 type StringResolverConstraints = {
-  min?: Constraint;
-  max?: Constraint;
-  email?: Constraint;
-  url?: Constraint;
-  uuid?: Constraint;
-  matches?: Constraint;
+  min?: Constraint.NumberConstraint;
+  max?: Constraint.NumberConstraint;
+  email?: Constraint.SimpleConstraint;
+  url?: Constraint.SimpleConstraint;
+  uuid?: Constraint.SimpleConstraint;
+  matches?: Constraint.MatcheConstraint;
 }
 
 export class StringResolver extends BaseResolver {
@@ -23,21 +24,21 @@ export class StringResolver extends BaseResolver {
     this.matches = constraints.matches
   }
 
-  min?: Constraint;
-  max?: Constraint;
-  email?: Constraint;
-  url?: Constraint;
-  uuid?: Constraint;
-  matches?: Constraint;
+  min?: Constraint.NumberConstraint;
+  max?: Constraint.NumberConstraint;
+  email?: Constraint.SimpleConstraint;
+  url?: Constraint.SimpleConstraint;
+  uuid?: Constraint.SimpleConstraint;
+  matches?: Constraint.MatcheConstraint;
 
   toResolver(key: string, dependencies: any) {
     let resolver = yup.string();
 
     if (this.min) {
-      resolver = resolver.min(Number(this.min.value), this.min.message)
+      resolver = resolver.min(this.min.value, this.min.message)
     }
     if (this.max) {
-      resolver = resolver.max(Number(this.max.value), this.max.message)
+      resolver = resolver.max(this.max.value, this.max.message)
     }
     if (this.email) {
       resolver = resolver.email(this.email.message)
@@ -48,7 +49,7 @@ export class StringResolver extends BaseResolver {
     if (this.uuid) {
       resolver = resolver.uuid(this.uuid.message)
     }
-    if (this.matches && this.matches.regexp) {
+    if (this.matches) {
       resolver = resolver.matches(this.matches.regexp, { message: this.matches.message})
     }
 

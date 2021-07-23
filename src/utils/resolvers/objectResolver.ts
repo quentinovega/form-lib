@@ -1,26 +1,36 @@
 
 import * as yup from 'yup';
-import { BaseResolverConstraints, Constraint } from './types';
+import { BaseResolverConstraints } from './baseResolver';
+import * as Constraints from './types';
 import { BaseResolver } from './baseResolver';
+import { buildResolver } from '../form'
 
 type ObjectResolverConstraints = {
-  shape?: any
-  noUnknown ?: Constraint
+  // shape?: any
+  noUnknown ?: Constraints.NoUnknownConstraint
+  schema?: object
 }
 
 export class ObjectResolver extends BaseResolver {
   constructor(constraints: BaseResolverConstraints & ObjectResolverConstraints) {
     super('object', constraints)
 
-    this.shape = constraints.shape
+    this.schema = constraints.schema
     this.noUnknown = constraints.noUnknown
   }
 
-  shape: Constraint
-  noUnknown?: Constraint
+  schema?: object
+  noUnknown?: Constraints.NoUnknownConstraint
 
   toResolver(key: string, dependencies: any) {
     let resolver = yup.object()
+
+    // if (this.schema) {
+    //   resolver = resolver.shape(buildResolver(this.schema), dependencies) //FIXME: comprendre le bail
+    // }
+    if (this.noUnknown) {
+      resolver = resolver.noUnknown(this.noUnknown.onlyKnownKeys, this.noUnknown.message)
+    }
 
     return super.toBaseResolver(resolver, key, dependencies)
       .test('test', 'no empty key allowed', v => Object.keys(v).every(k => k !== ''))

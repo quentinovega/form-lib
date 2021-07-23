@@ -52,7 +52,7 @@ export const buildSubResolver = (props, key, dependencies) => {
 }
 
 
-const buildResolver = (schema, dependencies = []) => {
+export const buildResolver = (schema, dependencies = []) => {
   const shape = Object.entries(schema)
     .reduce((resolvers, [key, props]) => {
       const resolver = buildSubResolver(props, key, dependencies);

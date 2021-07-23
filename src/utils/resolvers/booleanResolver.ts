@@ -1,20 +1,10 @@
 
 import * as yup from 'yup';
-import { BaseResolverConstraints, Constraint } from './types';
+import { BaseResolverConstraints } from './baseResolver';
 import { BaseResolver } from './baseResolver';
 
-type BooleanResolverConstraints = {
-  min?: Constraint;
-  max?: Constraint;
-  positive?: Constraint;
-  negative?: Constraint;
-  integer?: Constraint;
-  lessThan?: Constraint;
-  moreThan?: Constraint;
-}
-
 export class BooleanResolver extends BaseResolver {
-  constructor(constraints: BaseResolverConstraints & BooleanResolverConstraints) {
+  constructor(constraints: BaseResolverConstraints) {
     super('boolean', constraints)
   }
 
