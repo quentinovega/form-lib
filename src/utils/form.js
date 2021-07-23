@@ -96,7 +96,7 @@ const CustomizableInput = props => {
   return props.children
 }
 
-export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
+export const Form = ({ schema, flow, value, inputWrapper, onChange, footer }) => {
   //todo: use flow for better defaultValue
   //todo: build recursively with subSchema
   const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
@@ -127,11 +127,21 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange }) => {
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
         register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
         setValue={setValue} watch={watch} inputWrapper={inputWrapper} />)}
-      <div className="d-flex flex-row justify-content-end">
-        <button className="btn btn-danger" type="button" onClick={() => reset(defaultValues)}>Annuler</button>
-        <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
-      </div>
+
+      <Footer render={footer} reset={() => reset(defaultValues)} valid={() => handleSubmit(onChange)}/>
     </form>
+  )
+}
+
+const Footer = (props) => {
+  if (props.render({ reset: props.reset, valid: props.valid})) {
+    return props.render()
+  }
+  return (
+    <div className="d-flex flex-row justify-content-end">
+      <button className="btn btn-danger" type="button" onClick={props.reset}>Annuler</button>
+      <button className="btn btn-success ml-1" type="submit">Sauvegarder</button>
+    </div>
   )
 }
 

@@ -212,15 +212,16 @@ export const BackOffice = (props) => {
       label: 'incantations',
       help: 'Incantation sous form d\'objet {nom, puissance (*/100)} max opuissnce total = 100',
       defaultKeyValue: {'spellName': 50},
-      // defaultValue: {
-      //   ice: '',
-      //   fire: '',
-      //   air: '',
-      //   lightning: ''
-      // },
+      defaultValue: {
+        ice: '',
+        fire: '',
+        air: '',
+        lightning: ''
+      },
       constraints: {
         required: constraints.required('incancantation requises'),
-        test: constraints.test("power", 'pas plus de 100 de pouvoir', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) <= 100)
+        test: constraints.test("power", 'incantation requise a minima', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) > 0),
+        // test: constraints.test("power", 'pas plus de 100 de pouvoir', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) <= 100)
       }
     }
   }
@@ -306,6 +307,14 @@ export const BackOffice = (props) => {
           onChange={item => console.log({ item })}
           value={user}
           // inputWrapper={Wrapper}
+          footer={(reset, valid) => {
+            return (
+              <div className="d-flex justify-content-end">
+                <button className="btn btn-primary m-3" onClick={reset}>reset</button>
+                <button className="btn btn-success m-3" onClick={valid}>accept</button>
+              </div>
+            )
+          }}
         />
       </div>
     </div>
