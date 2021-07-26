@@ -77,6 +77,7 @@ export const BackOffice = (props) => {
       label: 'biographie',
       placeholder: 'raconte ton histoire',
       help: "bio du personnage",
+      defaultValue: "biographie",
       props: {
         rows: 10,
         cols: 70
@@ -232,23 +233,23 @@ export const BackOffice = (props) => {
     'bio',
     'game',
     'name',
-    'age',
-    'city',
-    {
-      label: 'pere du personnage',
-      flow: [
-        'fatherName',
-        'fatherAge'
-      ],
-      collapsed: true
-    },
-    'human',
-    'species',
-    'genre',
-    'weapons',
-    'birthday',
-    'abilities',
-    'spells'
+    // 'age',
+    // 'city',
+    // {
+    //   label: 'pere du personnage',
+    //   flow: [
+    //     'fatherName',
+    //     'fatherAge'
+    //   ],
+    //   collapsed: true
+    // },
+    // 'human',
+    // 'species',
+    // 'genre',
+    // 'weapons',
+    // 'birthday',
+    // 'abilities',
+    // 'spells'
   ];
 
   const thor = {

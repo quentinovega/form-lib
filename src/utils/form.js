@@ -23,9 +23,9 @@ export const buildSubResolver = (props, key, dependencies) => {
     if (props.schema && props.schema.type) {
       subResolver = buildSubResolver(props.schema, key, dependencies)
     } else if (props.schema) {
-      subResolver = buildResolver(props.schema)
+      resolver = getShapeAndDependencies(Object.keys(props.schema), props.schema, dependencies)
+      subResolver = yup.object().shape(resolver, dependencies);
     }
-
     resolver = new ArrayResolver(constraints).toResolver(subResolver, key, dependencies);
   } else {
     switch (type) {
@@ -51,15 +51,18 @@ export const buildSubResolver = (props, key, dependencies) => {
   return resolver
 }
 
+export const getShapeAndDependencies = (flow, schema, dependencies = []) => {
+  const shape = flow.reduce((resolvers, key) => {
+    if (typeof key === 'object') {
+      return { ...resolvers, ...getShapeAndDependencies(key.flow, schema, dependencies).shape }
+    }
+    const resolver = buildSubResolver(schema[key], key, dependencies);
+    return { ...resolvers, [key]: resolver }
+  }, {})
 
-export const buildResolver = (schema, dependencies = []) => {
-  const shape = Object.entries(schema)
-    .reduce((resolvers, [key, props]) => {
-      const resolver = buildSubResolver(props, key, dependencies);
-      return { ...resolvers, [key]: resolver }
-    }, {})
-  return yup.object().shape(shape, dependencies);
+  return { shape, dependencies }
 }
+
 
 const BasicWrapper = ({ entry, label, error, help, children, render }) => {
   const id = uuid();
@@ -96,10 +99,13 @@ const CustomizableInput = props => {
   return props.children
 }
 
-export const Form = ({ schema, flow, value, inputWrapper, onChange, footer }) => {
-  //todo: use flow for better defaultValue
-  //todo: build recursively with subSchema
-  const defaultValues = Object.entries(schema).reduce((acc, [key, entry]) => {
+const getDefaultValues = (flow, schema) => {
+
+  return flow.reduce((acc, key) => {
+    const entry = schema[key]
+    if (typeof key === 'object') {
+      return { ...acc, ...getDefaultValues(key.flow, schema)}
+    }
     if (typeof entry.defaultValue !== 'undefined' && entry.defaultValue !== null) {
       return { ...acc, [key]: entry.defaultValue }
     }
@@ -108,9 +114,16 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange, footer }) =>
     if (entry.format === 'array' || entry.isMulti) { defaultValue = [] }
     return { ...acc, [key]: defaultValue }
   }, {})
+}
+
+export const Form = ({ schema, flow, value, inputWrapper, onChange, footer }) => {
+  const defaultValues = getDefaultValues(flow, schema);
+
+  const { shape, dependencies } = getShapeAndDependencies(flow, schema);
+  const resolver = yup.object().shape(shape, dependencies);
 
   const { register, handleSubmit, formState: { errors }, control, reset, watch, trigger, getValues, setValue } = useForm({
-    resolver: yupResolver(buildResolver(schema)),
+    resolver: yupResolver(resolver),
     defaultValues: value || defaultValues
   });
 
@@ -127,14 +140,13 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange, footer }) =>
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
         register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
         setValue={setValue} watch={watch} inputWrapper={inputWrapper} />)}
-
-      <Footer render={footer} reset={() => reset(defaultValues)} valid={() => handleSubmit(onChange)}/>
+      <Footer render={footer} reset={() => reset(defaultValues)} valid={() => handleSubmit(onChange)} />
     </form>
   )
 }
 
 const Footer = (props) => {
-  if (props.render({ reset: props.reset, valid: props.valid})) {
+  if (props.render({ reset: props.reset, valid: props.valid })) {
     return props.render()
   }
   return (
@@ -185,7 +197,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                 <textarea
                   type="text" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                  disabled={step.disabled ? 'disabled' : null}
+                  readOnly={step.disabled ? 'readOnly' : null}
                   {...step.props}
                   name={entry}
                   placeholder={step.placeholder}
@@ -209,7 +221,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                         <input
                           {...step.props}
                           type="text"
-                          disabled={step.disabled ? 'disabled' : null}
+                          readOnly={step.disabled ? 'readOnly' : null}
                           className={classNames("form-control", { 'is-invalid': errors[entry] && errors[entry][idx] })}
                           placeholder={step.placeholder} {...props} />
                         {errors[entry] && errors[entry][idx] && <div className="invalid-feedback">{errors[entry][idx].message}</div>}
@@ -231,7 +243,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                       <SelectInput
                         {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
-                        disabled={step.disabled ? 'disabled' : null}
+                        readOnly={step.disabled ? 'readOnly' : null}
                         onChange={field.onChange}
                         value={field.value}
                         possibleValues={step.options}
@@ -251,7 +263,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                   {...step.props}
                   type="password" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                  disabled={step.disabled ? 'disabled' : null}
+                  readOnly={step.disabled ? 'readOnly' : null}
                   name={entry}
                   placeholder={step.placeholder}
                   {...register(entry)} />
@@ -259,6 +271,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             </BasicWrapper>
           );
         default:
+          console.debug({step})
           return (
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <CustomizableInput render={step.render} field={{ value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
@@ -266,7 +279,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                   {...step.props}
                   type="text" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                  disabled={step.disabled ? 'disabled' : null}
+                  readOnly={step.disabled ? 'readOnly' : null}
                   name={entry}
                   placeholder={step.placeholder}
                   {...register(entry)} />
@@ -292,7 +305,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                           {...step.props}
                           type="number"
                           className={classNames("form-control", { 'is-invalid': errors[entry] && errors[entry][idx] })}
-                          disabled={step.disabled ? 'disabled' : null}
+                          readOnly={step.disabled ? 'readOnly' : null}
                           placeholder={step.placeholder} {...props} />
                         {errors[entry] && errors[entry][idx] && <div className="invalid-feedback">{errors[entry][idx].message}</div>}
                       </>
@@ -310,7 +323,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                   {...step.props}
                   type="number" id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                  disabled={step.disabled ? 'disabled' : null}
+                  readOnly={step.disabled ? 'readOnly' : null}
                   name={entry}
                   placeholder={step.placeholder}
                   {...register(entry)} />
@@ -331,7 +344,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                   <BooleanInput
                     {...step.props}
                     className={classNames({ 'is-invalid': errors[entry] })}
-                    disabled={step.disabled ? 'disabled' : null}
+                    readOnly={step.disabled ? 'readOnly' : null}
                     onChange={field.onChange}
                     value={field.value}
                   />
@@ -357,7 +370,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                       <SelectInput
                         {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
-                        disabled={step.disabled ? 'disabled' : null}
+                        readOnly={step.disabled ? 'readOnly' : null}
                         onChange={field.onChange}
                         value={field.value}
                         possibleValues={step.options}
@@ -382,7 +395,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                       <ObjectInput
                         {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
-                        disabled={step.disabled ? 'disabled' : null}
+                        readOnly={step.disabled ? 'readOnly' : null}
                         onChange={field.onChange}
                         value={field.value}
                         possibleValues={step.options}
@@ -409,7 +422,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                     {...step.props}
                     id="datePicker-1"
                     className={classNames({ 'is-invalid': errors[entry] })}
-                    disabled={step.disabled ? 'disabled' : null}
+                    readOnly={step.disabled ? 'readOnly' : null}
                     value={field.value}
                     onChange={field.onChange}
                     formatStyle="large"

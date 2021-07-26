@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { BaseResolverConstraints } from './baseResolver';
 import * as Constraints from './types';
 import { BaseResolver } from './baseResolver';
-import { buildResolver } from '../form'
+import { getShapeAndDependencies } from '../form'
 
 type ObjectResolverConstraints = {
   // shape?: any
@@ -25,9 +25,9 @@ export class ObjectResolver extends BaseResolver {
   toResolver(key: string, dependencies: any) {
     let resolver = yup.object()
 
-    // if (this.schema) {
-    //   resolver = resolver.shape(buildResolver(this.schema), dependencies) //FIXME: comprendre le bail
-    // }
+    if (this.schema) {
+      resolver = resolver.shape(getShapeAndDependencies(Object.keys(this.schema), this.schema).shape, dependencies)
+    }
     if (this.noUnknown) {
       resolver = resolver.noUnknown(this.noUnknown.onlyKnownKeys, this.noUnknown.message)
     }
