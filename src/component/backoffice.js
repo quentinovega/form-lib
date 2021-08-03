@@ -144,17 +144,18 @@ export const BackOffice = (props) => {
       //   { label: "sword", weight: 2, rarity: 'common' }, 
       //   { label: "bazooka", weight: 10, rarity: 'epic' },
       //   { label: "excalibur", weight: 100, rarity: 'legendary' }],
-      schema: {
-        label: {
-          type: Types.string,
-        },
-        weight: {
-          type: Types.number
-        },
-        rarity: {
-          type: Types.string
-        }
-      },
+      // FIXME: if we provide a schema yup is broken
+      // schema: {
+      //   label: {
+      //     type: Types.string,
+      //   },
+      //   weight: {
+      //     type: Types.number
+      //   },
+      //   rarity: {
+      //     type: Types.string
+      //   }
+      // },
       constraints: {
         // min: constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
         length: constraints.length(2, '2 armes obligatoire'),
@@ -246,7 +247,7 @@ export const BackOffice = (props) => {
     // 'human',
     // 'species',
     // 'genre',
-    // 'weapons',
+    'weapons',
     // 'birthday',
     // 'abilities',
     // 'spells'
@@ -318,6 +319,14 @@ export const BackOffice = (props) => {
               </div>
             )
           }}
+          // httpClient={(url, method) => fetch(url, {
+          //   method,
+          //   headers: {
+          //     Accept: 'application/json',
+          //     'Content-Type': 'application/json',
+          //     'X-foo': 'bar'
+          //   }
+          // })}
         />
       </div>
     </div>

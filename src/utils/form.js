@@ -116,7 +116,21 @@ const getDefaultValues = (flow, schema) => {
   }, {})
 }
 
-export const Form = ({ schema, flow, value, inputWrapper, onChange, footer }) => {
+export const Form = ({ schema, flow, value, inputWrapper, onChange, footer, httpClient }) => {
+
+  const maybeCustomHttpClient = (url, method) =>  {
+    //todo: if present props.resolve()
+    if (httpClient) {
+      return httpClient(url, method)
+    }
+    return fetch(url, {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+  })}
+
   const defaultValues = getDefaultValues(flow, schema);
 
   const { shape, dependencies } = getShapeAndDependencies(flow, schema);
@@ -139,7 +153,7 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange, footer }) =>
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
         register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
-        setValue={setValue} watch={watch} inputWrapper={inputWrapper} />)}
+        setValue={setValue} watch={watch} inputWrapper={inputWrapper} httpClient={maybeCustomHttpClient}/>)}
       <Footer render={footer} reset={() => reset(defaultValues)} valid={() => handleSubmit(onChange)} />
     </form>
   )
@@ -157,7 +171,7 @@ const Footer = (props) => {
   )
 }
 
-const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue, watch, inputWrapper }) => {
+const Step = ({ entry, step, errors, register, schema, control, trigger, getValues, setValue, watch, inputWrapper, httpClient }) => {
 
   if (entry && typeof entry === 'object') {
     const errored = entry.flow.some(step => !!errors[step])
@@ -374,6 +388,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
                         onChange={field.onChange}
                         value={field.value}
                         possibleValues={step.options}
+                        httpClient={httpClient}
                         {...step}
                       />
                     </CustomizableInput>

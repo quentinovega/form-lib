@@ -42,13 +42,7 @@ export const SelectInput = (props) => {
 
       if (cond) {
         setLoading(true);
-        return fetch(props.optionsFrom, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          },
-        })
+        return props.httpClient(props.optionsFrom, 'GET')
           .then((r) => r.json())
           .then((values) => values.map(props.transformer || valueToSelectoption))
           .then((values) => {
