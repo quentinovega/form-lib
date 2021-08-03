@@ -32,7 +32,7 @@ export const BackOffice = (props) => {
       constraints: {
         required: { message: "le nom est obligatoire" },
       },
-      render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)}/>
+      render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
     },
     fatherName: {
       type: Types.string,
@@ -180,8 +180,8 @@ export const BackOffice = (props) => {
       format: 'select',
       label: 'ville',
       help: 'Ville de résidence',
-      transformer: (value) => ({label: value.label, value: value.id}),
-      options: [{label: 'Neo-Tokyo', id: 1}, {label: 'Asgard', id: 2}, {label: 'Fondcombe', id: 3}],
+      transformer: (value) => ({ label: value.label, value: value.id }),
+      options: [{ label: 'Neo-Tokyo', id: 1 }, { label: 'Asgard', id: 2 }, { label: 'Fondcombe', id: 3 }],
       constraints: {
         required: constraints.required(`Personne n'habite nulle-part jsuqu'à preuve du contraire`)
       }
@@ -204,16 +204,17 @@ export const BackOffice = (props) => {
         // moreThan: constraints.length(2, '2 abilities min obligatoire')
       },
       render: (props) => {
-      return  <div className="d-flex">
-        <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
-        {props.error && <div style={{color: 'tomato'}}>{props.error.message}</div>}
-        </div>}
+        return <div className="d-flex">
+          <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
+          {props.error && <div style={{ color: 'tomato' }}>{props.error.message}</div>}
+        </div>
+      }
     },
     spells: {
       type: Types.object,
       label: 'incantations',
       help: 'Incantation sous form d\'objet {nom, puissance (*/100)} max opuissnce total = 100',
-      defaultKeyValue: {'spellName': 50},
+      defaultKeyValue: { 'spellName': 50 },
       defaultValue: {
         ice: '',
         fire: '',
@@ -226,6 +227,15 @@ export const BackOffice = (props) => {
           constraints.test("power", 'incantation requise a minima', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) > 0),
           constraints.test("power", 'pas plus de 100 de pouvoir', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) <= 100)
         ]
+      }
+    },
+    code: {
+      type: Types.string,
+      format: 'code',
+      label: 'just code',
+      help: 'Juste du code, hop hop hop',
+      constraints: {
+        required: constraints.required('le code est requis merci')
       }
     }
   }
@@ -250,7 +260,8 @@ export const BackOffice = (props) => {
     'weapons',
     // 'birthday',
     // 'abilities',
-    // 'spells'
+    // 'spells',
+    'code'
   ];
 
   const thor = {
@@ -267,7 +278,7 @@ export const BackOffice = (props) => {
     weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "Mjolnir", weight: 100, rarity: 'legendary' }],
     birthday: new Date('August 19, 1975 23:15:30'),
     abilities: ['Brave', 'Fair', 'Worthy'],
-    spells: {linghtningBolt: 100}
+    spells: { linghtningBolt: 100 }
   }
 
   const loki = {
@@ -284,7 +295,7 @@ export const BackOffice = (props) => {
     weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
     birthday: new Date('August 19, 1985 23:15:30'),
     abilities: ['Vile', 'Unfair', 'Unworthy'],
-    spells: { fakeSnake: 10, hypnosis: 70, realityChanging: 20}
+    spells: { fakeSnake: 10, hypnosis: 70, realityChanging: 20 }
   }
 
   // const Wrapper = ({ entry, label, error, children}) => {
@@ -319,14 +330,14 @@ export const BackOffice = (props) => {
               </div>
             )
           }}
-          // httpClient={(url, method) => fetch(url, {
-          //   method,
-          //   headers: {
-          //     Accept: 'application/json',
-          //     'Content-Type': 'application/json',
-          //     'X-foo': 'bar'
-          //   }
-          // })}
+        // httpClient={(url, method) => fetch(url, {
+        //   method,
+        //   headers: {
+        //     Accept: 'application/json',
+        //     'Content-Type': 'application/json',
+        //     'X-foo': 'bar'
+        //   }
+        // })}
         />
       </div>
     </div>

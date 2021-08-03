@@ -9,7 +9,7 @@ import ReactToolTip from 'react-tooltip';
 import { HelpCircle } from 'react-feather';
 import { v4 as uuid } from 'uuid';
 
-import { BooleanInput, Collapse, SelectInput, ObjectInput } from './inputs';
+import { BooleanInput, Collapse, SelectInput, ObjectInput, CodeInput } from './inputs';
 
 import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
 import { option } from '../utils/Option'
@@ -104,7 +104,7 @@ const getDefaultValues = (flow, schema) => {
   return flow.reduce((acc, key) => {
     const entry = schema[key]
     if (typeof key === 'object') {
-      return { ...acc, ...getDefaultValues(key.flow, schema)}
+      return { ...acc, ...getDefaultValues(key.flow, schema) }
     }
     if (typeof entry.defaultValue !== 'undefined' && entry.defaultValue !== null) {
       return { ...acc, [key]: entry.defaultValue }
@@ -118,18 +118,19 @@ const getDefaultValues = (flow, schema) => {
 
 export const Form = ({ schema, flow, value, inputWrapper, onChange, footer, httpClient }) => {
 
-  const maybeCustomHttpClient = (url, method) =>  {
+  const maybeCustomHttpClient = (url, method) => {
     //todo: if present props.resolve()
     if (httpClient) {
       return httpClient(url, method)
     }
     return fetch(url, {
-    method,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-  })}
+      method,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+    })
+  }
 
   const defaultValues = getDefaultValues(flow, schema);
 
@@ -153,7 +154,7 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange, footer, http
     <form className="col-12 section pt-2 pr-2" onSubmit={handleSubmit(onChange)}>
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
         register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
-        setValue={setValue} watch={watch} inputWrapper={inputWrapper} httpClient={maybeCustomHttpClient}/>)}
+        setValue={setValue} watch={watch} inputWrapper={inputWrapper} httpClient={maybeCustomHttpClient} />)}
       <Footer render={footer} reset={() => reset(defaultValues)} valid={() => handleSubmit(onChange)} />
     </form>
   )
@@ -219,7 +220,28 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               </CustomizableInput>
             </BasicWrapper>
           );
-        case 'code': //todo
+        case 'code': return (
+          <Controller
+            name={entry}
+            control={control}
+            render={({ field }) => {
+              return (
+                <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+                  <CustomizableInput render={step.render} field={field} error={errors[entry]}>
+                    <CodeInput
+                      {...step.props}
+                      className={classNames({ 'is-invalid': errors[entry] })}
+                      readOnly={step.disabled ? 'readOnly' : null}
+                      onChange={field.onChange}
+                      value={field.value}
+                      {...step}
+                    />
+                  </CustomizableInput>
+                </BasicWrapper>
+              )
+            }}
+          />
+        )
         case 'markdown': //todo
         case 'array':
           return (
@@ -285,7 +307,6 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             </BasicWrapper>
           );
         default:
-          console.debug({step})
           return (
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <CustomizableInput render={step.render} field={{ value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
