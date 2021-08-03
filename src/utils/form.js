@@ -9,7 +9,7 @@ import ReactToolTip from 'react-tooltip';
 import { HelpCircle } from 'react-feather';
 import { v4 as uuid } from 'uuid';
 
-import { BooleanInput, Collapse, SelectInput, ObjectInput, CodeInput } from './inputs';
+import { BooleanInput, Collapse, SelectInput, ObjectInput, CodeInput, MarkdownInput } from './inputs';
 
 import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
 import { option } from '../utils/Option'
@@ -242,7 +242,28 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
             }}
           />
         )
-        case 'markdown': //todo
+        case 'markdown': return (
+          <Controller
+            name={entry}
+            control={control}
+            render={({ field }) => {
+              return (
+                <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+                  <CustomizableInput render={step.render} field={field} error={errors[entry]}>
+                    <MarkdownInput
+                      {...step.props}
+                      className={classNames({ 'is-invalid': errors[entry] })}
+                      readOnly={step.disabled ? 'readOnly' : null}
+                      onChange={field.onChange}
+                      value={field.value}
+                      {...step}
+                    />
+                  </CustomizableInput>
+                </BasicWrapper>
+              )
+            }}
+          />
+        )
         case 'array':
           return (
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>

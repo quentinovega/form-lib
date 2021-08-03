@@ -231,7 +231,7 @@ export const BackOffice = (props) => {
     },
     code: {
       type: Types.string,
-      format: 'code',
+      format: 'markdown',
       label: 'just code',
       help: 'Juste du code, hop hop hop',
       constraints: {

@@ -22,8 +22,6 @@ export const ArrayInput = (props) => {
   
 
   useEffect(() => {
-    //todo: why reload after choose option
-    //todo: nice to have a fucntion to replace our fetch
     if (props.optionsFrom) {
       const cond = option(props.fetchCondition).map(cond => cond()).getOrElse(true);
 
