@@ -9,10 +9,10 @@ import ReactToolTip from 'react-tooltip';
 import { HelpCircle } from 'react-feather';
 import { v4 as uuid } from 'uuid';
 
-import { BooleanInput, Collapse, SelectInput, ObjectInput, CodeInput, MarkdownInput } from './inputs';
+import { BooleanInput, Collapse, SelectInput, ObjectInput, CodeInput, MarkdownInput } from './inputs/index';
 
-import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers';
-import { option } from '../utils/Option'
+import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers/index.ts';
+import { option } from './Option'
 
 export const buildSubResolver = (props, key, dependencies) => {
   let resolver;

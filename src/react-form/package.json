@@ -1,0 +1,8 @@
+{
+  "name": "react-formulaires",
+  "description": "Build react safe forms as fast as possible",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Quentin AUBERT",
+  "license": "MIT"
+}

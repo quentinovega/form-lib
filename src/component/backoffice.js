@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Types, constraints } from '../utils';
+import { Form, Types, constraints } from '../react-form';
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 
