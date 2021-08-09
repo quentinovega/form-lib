@@ -25,5 +25,5 @@ yarn-error.log*
 
 .vscode/
 
-react-form/lib
-react-form/dist
+/react-form/lib
+/react-form/dist
