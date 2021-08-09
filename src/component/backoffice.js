@@ -320,14 +320,14 @@ export const BackOffice = (props) => {
           onChange={item => console.log({ item })}
           value={user}
           // inputWrapper={Wrapper}
-          // footer={(reset, valid) => {
-          //   return (
-          //     <div className="d-flex justify-content-end">
-          //       <button className="btn btn-primary m-3" onClick={reset}>reset</button>
-          //       <button className="btn btn-success m-3" onClick={valid}>accept</button>
-          //     </div>
-          //   )
-          // }}
+          footer={({reset, valid}) => {
+            return (
+              <div className="d-flex justify-content-end">
+                <button className="btn btn-primary m-3" onClick={reset}>reset</button>
+                <button className="btn btn-success m-3" onClick={valid}>accept</button>
+              </div>
+            )
+          }}
         // httpClient={(url, method) => fetch(url, {
         //   method,
         //   headers: {
