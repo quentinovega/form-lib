@@ -6,9 +6,10 @@
   "author": "Quentin AUBERT",
   "license": "MIT",
   "scripts": {
-    "lib": "babel src --extensions '.ts' --out-dir lib && babel src --out-dir lib",
+    "build:lib": "babel src --extensions \".ts,.js\" --out-dir lib",
+    "build:types": "tsc --declaration --emitDeclarationOnly ",
     "bundle": "cross-env NODE_ENV=production webpack --color --progress",
-    "build": "yarn bundle && yarn lib"
+    "build": "yarn bundle && yarn build:lib && yarn build:types"
   },
   "peerDependencies": {
     "react": "^17.0.2",

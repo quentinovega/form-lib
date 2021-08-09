@@ -155,7 +155,7 @@ export const Form = ({ schema, flow, value, inputWrapper, onChange, footer, http
       {flow.map((entry, idx) => <Step key={idx} entry={entry} step={schema[entry]} errors={errors}
         register={register} schema={schema} control={control} trigger={trigger} getValues={getValues}
         setValue={setValue} watch={watch} inputWrapper={inputWrapper} httpClient={maybeCustomHttpClient} />)}
-      <Footer render={footer} reset={() => reset(defaultValues)} valid={() => handleSubmit(onChange)} />
+      <Footer render={footer} reset={() => reset(defaultValues)} valid={handleSubmit(onChange)} />
     </form>
   )
 }
