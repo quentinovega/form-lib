@@ -1,3 +1,5 @@
+import Reference from "yup/lib/Reference";
+
 export interface SimpleConstraint {
   message: string;
 }
@@ -14,13 +16,14 @@ export interface StringConstraint {
   value: string;
   message: string;
 }
-
-export interface ReferenceConstraint {
-  ref: string | number;
+export interface NumberReferenceConstraint {
+  ref: Reference<number> | number;
   message: string;
 }
 
-export interface TestConstraint extends ReferenceConstraint {
+export interface TestConstraint {
+  name: string;
+  message: string;
   test: (val: any) => boolean;
 }
 export interface WhenConstraint {
@@ -41,4 +44,8 @@ export interface OneOfConstraint {
 export interface NoUnknownConstraint {
   message: string;
   onlyKnownKeys?: boolean;
+}
+
+export interface Ref {
+  ref: string;
 }

@@ -235,6 +235,23 @@ export const BackOffice = (props) => {
       constraints: {
         required: constraints.required('le code est requis merci')
       }
+    },
+    password: {
+      type: Types.string,
+      format: 'password',
+      label: 'password',
+      constraints: {
+        required: constraints.required('password is required')
+      }
+    },
+    confirmPassword: {
+      type: Types.string,
+      format: 'password',
+      label: 'confirm password',
+      constraints: {
+        required: constraints.required('confirm password is required'),
+        oneOf: constraints.oneOf([constraints.ref('password')], 'confirm and password must be equal')
+      }
     }
   }
 
@@ -254,12 +271,14 @@ export const BackOffice = (props) => {
     // },
     // 'human',
     // 'species',
-    'genre',
-    'weapons',
+    // 'genre',
+    // 'weapons',
     // 'birthday',
-    'abilities',
+    // 'abilities',
     // 'spells',
-    'code'
+    // 'code'
+    'password',
+    'confirmPassword'
   ];
 
   const thor = {

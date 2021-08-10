@@ -4,8 +4,8 @@ import * as Constraint from './types';
 import { BaseResolver } from './baseResolver';
 
 type StringResolverConstraints = {
-  min?: Constraint.NumberConstraint;
-  max?: Constraint.NumberConstraint;
+  min?: Constraint.NumberReferenceConstraint;
+  max?: Constraint.NumberReferenceConstraint;
   email?: Constraint.SimpleConstraint;
   url?: Constraint.SimpleConstraint;
   uuid?: Constraint.SimpleConstraint;
@@ -24,8 +24,8 @@ export class StringResolver extends BaseResolver {
     this.matches = constraints.matches
   }
 
-  min?: Constraint.NumberConstraint;
-  max?: Constraint.NumberConstraint;
+  min?: Constraint.NumberReferenceConstraint;
+  max?: Constraint.NumberReferenceConstraint;
   email?: Constraint.SimpleConstraint;
   url?: Constraint.SimpleConstraint;
   uuid?: Constraint.SimpleConstraint;
@@ -35,10 +35,10 @@ export class StringResolver extends BaseResolver {
     let resolver = yup.string();
 
     if (this.min) {
-      resolver = resolver.min(this.min.value, this.min.message)
+        resolver = resolver.min(this.min.ref, this.min.message)
     }
     if (this.max) {
-      resolver = resolver.max(this.max.value, this.max.message)
+      resolver = resolver.max(this.max.ref, this.max.message)
     }
     if (this.email) {
       resolver = resolver.email(this.email.message)

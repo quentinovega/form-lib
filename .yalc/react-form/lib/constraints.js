@@ -134,7 +134,7 @@ var length = function length(value) {
 exports.length = length;
 
 var test = function test(ref) {
-  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'test faile';
+  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'test failed';
   var test = arguments.length > 2 ? arguments[2] : undefined;
   return {
     ref: ref,

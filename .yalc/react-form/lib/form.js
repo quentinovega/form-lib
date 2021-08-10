@@ -272,9 +272,7 @@ var Form = function Form(_ref2) {
     reset: function reset() {
       return _reset(defaultValues);
     },
-    valid: function valid() {
-      return handleSubmit(onChange);
-    }
+    valid: handleSubmit(onChange)
   }));
 };
 

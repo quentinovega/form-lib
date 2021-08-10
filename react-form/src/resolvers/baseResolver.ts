@@ -8,6 +8,7 @@ export type BaseResolverConstraints = {
   test?: Constraints.TestConstraint | Array<Constraints.TestConstraint>;
   when?: Constraints.WhenConstraint | Array<Constraints.WhenConstraint>;
   oneOf?: Constraints.OneOfConstraint;
+  nullable?: boolean
 }
 
 export class BaseResolver {
@@ -18,6 +19,7 @@ export class BaseResolver {
     this.test = constraints.test
     this.when = constraints.when
     this.oneOf = constraints.oneOf
+    this.nullable = constraints.nullable
   }
   type: string
 
@@ -25,6 +27,7 @@ export class BaseResolver {
   test?: Constraints.TestConstraint | Array<Constraints.TestConstraint>;
   when?: Constraints.WhenConstraint | Constraints.WhenConstraint[];
   oneOf?: Constraints.OneOfConstraint;
+  nullable?: boolean
 
   toBaseResolver(yupResolver: yup.AnySchema, key: string, dependencies: any) {
     let baseResolver = yupResolver;
@@ -34,12 +37,10 @@ export class BaseResolver {
     if (this.test) {
       if (Array.isArray(this.test)) {
         this.test.forEach(t => {
-          baseResolver = baseResolver.test(String(t.ref), t.message, t.test)
-          dependencies.push([key, t.ref])
+          baseResolver = baseResolver.test(t.name, t.message, t.test)
         })
       } else {
-        baseResolver = baseResolver.test(String(this.test.ref), this.test.message, this.test.test)
-        dependencies.push([key, this.test.ref])
+        baseResolver = baseResolver.test(this.test.name, this.test.message, this.test.test)
       }
     }
 
@@ -65,6 +66,10 @@ export class BaseResolver {
         })
         dependencies.push([key, this.when.ref])
       }
+    }
+
+    if (!!this.nullable) {
+      baseResolver = baseResolver.nullable()
     }
 
     return baseResolver

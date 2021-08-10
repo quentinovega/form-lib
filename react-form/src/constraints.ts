@@ -1,13 +1,15 @@
 import { 
   MatcheConstraint, 
   NumberConstraint, 
-  OneOfConstraint, 
-  ReferenceConstraint, 
+  OneOfConstraint,
+  NumberReferenceConstraint, 
   SimpleConstraint, 
   TestConstraint, 
-  WhenConstraint 
+  WhenConstraint
 } from "./resolvers/types"
 
+import * as yup from 'yup';
+import Reference from "yup/lib/Reference";
 
 export const required = (message: string = "Ce champ est requis"): SimpleConstraint => ({ message })
 
@@ -17,19 +19,23 @@ export const email = (message: string = "not an email"): SimpleConstraint => ({ 
 export const uuid = (message: string = "not an uuid"): SimpleConstraint => ({ message })
 export const matches = (regexp: RegExp = /.*/, message: string = "not an email"): MatcheConstraint => ({ regexp, message })
 
+//string & number
+export const min = (ref: number | Reference<number>, message: string = "trop petit"): NumberReferenceConstraint => ({ ref, message })
+export const max = (ref: number | Reference<number>, message: string = "trop grand"): NumberReferenceConstraint => ({ ref, message })
+
 //number
-export const min = (value: number, message: string = "trop petit"): NumberConstraint => ({ value, message })
-export const max = (value: number, message: string = "trop grand"): NumberConstraint => ({ value, message })
 export const positive = (message: string = "trop negatif"): SimpleConstraint => ({ message })
 export const negative = (message: string = "trop positif"): SimpleConstraint => ({ message })
 export const integer = (message: string = "an integer please"): SimpleConstraint => ({ message })
-export const lessThan = (ref: string | number, message: string = `plus grand que ${ref}`): ReferenceConstraint => ({ ref, message })
-export const moreThan = (ref: string | number, message: string = `plus petit que ${ref}`): ReferenceConstraint => ({ ref, message })
+export const lessThan = (ref: number | Reference<number>, message: string = `plus grand que ${ref}`): NumberReferenceConstraint => ({ ref, message })
+export const moreThan = (ref: number | Reference<number>, message: string = `plus petit que ${ref}`): NumberReferenceConstraint => ({ ref, message })
 
 //array
 export const length = (value: number, message: string = `la taille doit etre ${value}`): NumberConstraint => ({ value, message })
 
 //mixed
-export const test = (ref: string, message: string = 'test failed', test: (val: any) => boolean): TestConstraint=> ({ ref, message, test })
+export const test = (name: string, message: string = 'test failed', test: (val: any) => boolean): TestConstraint=> ({ name, message, test })
 export const when = (ref: string, test: (val: any) => boolean, then: object, otherwise: object): WhenConstraint => ({ ref, test, then, otherwise })
 export const oneOf = (arrayOfValues: any[], message: string): OneOfConstraint => ({ arrayOfValues, message })
+
+export const ref = (ref: string): Reference => yup.ref(ref)
