@@ -8,4 +8,5 @@ export const Types = {
   bool: 'bool',
   date: 'date',
   object: 'object',
+  file: 'file'
 }

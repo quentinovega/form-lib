@@ -33,6 +33,11 @@ export const moreThan = (ref: number | Reference<number>, message: string = `plu
 //array
 export const length = (value: number, message: string = `la taille doit etre ${value}`): NumberConstraint => ({ value, message })
 
+//file
+export const supportedFormat = (arrayOfValues: String[], message: 'Unsupported File Format'): OneOfConstraint => ({ arrayOfValues, message })
+export const unsupportedFormat = (arrayOfValues: String[], message: 'Unsupported File Format'): OneOfConstraint => ({ arrayOfValues, message })
+export const maxSize = (value: number, message: string = `size is excedeed ${value}`): NumberConstraint => ({value, message})
+
 //mixed
 export const test = (name: string, message: string = 'test failed', test: (val: any) => boolean): TestConstraint=> ({ name, message, test })
 export const when = (ref: string, test: (val: any) => boolean, then: object, otherwise: object): WhenConstraint => ({ ref, test, then, otherwise })

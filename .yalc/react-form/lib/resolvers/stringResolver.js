@@ -80,11 +80,11 @@ var StringResolver = /*#__PURE__*/function (_BaseResolver) {
       var resolver = yup.string();
 
       if (this.min) {
-        resolver = resolver.min(this.min.value, this.min.message);
+        resolver = resolver.min(this.min.ref, this.min.message);
       }
 
       if (this.max) {
-        resolver = resolver.max(this.max.value, this.max.message);
+        resolver = resolver.max(this.max.ref, this.max.message);
       }
 
       if (this.email) {

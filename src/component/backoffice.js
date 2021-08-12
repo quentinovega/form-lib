@@ -252,6 +252,16 @@ export const BackOffice = (props) => {
         required: constraints.required('confirm password is required'),
         oneOf: constraints.oneOf([constraints.ref('password')], 'confirm and password must be equal')
       }
+    },
+    avatar: {
+      type: Types.file,
+      format: 'hidden',
+      label: 'avatar',
+      constraints: {
+        required: constraints.required('your avatar is not set'),
+        maxSize: constraints.maxSize(2000000, 'no more than 2 Mo please'),
+        supportedFormat: constraints.supportedFormat(['jpeg'], 'just jpeg or png file please')
+      }
     }
   }
 
@@ -277,8 +287,7 @@ export const BackOffice = (props) => {
     // 'abilities',
     // 'spells',
     // 'code'
-    'password',
-    'confirmPassword'
+    'avatar'
   ];
 
   const thor = {

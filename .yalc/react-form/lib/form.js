@@ -37,6 +37,18 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
@@ -84,6 +96,10 @@ var buildSubResolver = function buildSubResolver(props, key, dependencies) {
 
       case _types.Types.date:
         resolver = new _index2.DateResolver(constraints).toResolver(key, dependencies);
+        break;
+
+      case _types.Types.file:
+        resolver = new _index2.FileResolver(constraints).toResolver(key, dependencies);
         break;
 
       default:
@@ -520,36 +536,6 @@ var Step = function Step(_ref3) {
             }
           });
 
-        case 'password':
-          return /*#__PURE__*/_react.default.createElement(BasicWrapper, {
-            entry: entry,
-            error: errors[entry],
-            label: entry,
-            help: step.help,
-            render: inputWrapper
-          }, /*#__PURE__*/_react.default.createElement(CustomizableInput, {
-            render: step.render,
-            field: {
-              rawValues: getValues(),
-              value: getValues(entry),
-              onChange: function onChange(v) {
-                return setValue(entry, v, {
-                  shouldValidate: true
-                });
-              }
-            },
-            error: errors[entry]
-          }, /*#__PURE__*/_react.default.createElement("input", _extends({}, step.props, {
-            type: "password",
-            id: entry,
-            className: (0, _classnames.default)("form-control", {
-              'is-invalid': errors[entry]
-            }),
-            readOnly: step.disabled ? 'readOnly' : null,
-            name: entry,
-            placeholder: step.placeholder
-          }, register(entry)))));
-
         default:
           return /*#__PURE__*/_react.default.createElement(BasicWrapper, {
             entry: entry,
@@ -570,13 +556,14 @@ var Step = function Step(_ref3) {
             },
             error: errors[entry]
           }, /*#__PURE__*/_react.default.createElement("input", _extends({}, step.props, {
-            type: "text",
+            type: step.format || 'text',
             id: entry,
             className: (0, _classnames.default)("form-control", {
               'is-invalid': errors[entry]
             }),
             readOnly: step.disabled ? 'readOnly' : null,
             name: entry,
+            defaultValue: "",
             placeholder: step.placeholder
           }, register(entry)))));
       }
@@ -781,22 +768,123 @@ var Step = function Step(_ref3) {
         }
       });
 
+    case _types.Types.file:
+      if (step.format === 'hidden') {
+        return /*#__PURE__*/_react.default.createElement(_reactHookForm.Controller, {
+          name: entry,
+          control: control,
+          render: function render(_ref11) {
+            var field = _ref11.field;
+
+            var FileInput = function FileInput(_ref12) {
+              var onChange = _ref12.onChange;
+
+              var _useState = (0, _react.useState)(false),
+                  _useState2 = _slicedToArray(_useState, 2),
+                  uploading = _useState2[0],
+                  setUploading = _useState2[1];
+
+              var _useState3 = (0, _react.useState)(undefined),
+                  _useState4 = _slicedToArray(_useState3, 2),
+                  input = _useState4[0],
+                  setInput = _useState4[1];
+
+              var setFiles = function setFiles(e) {
+                var files = e.target.files;
+                setUploading(true);
+                onChange(files);
+                setUploading(false);
+              };
+
+              var trigger = function trigger() {
+                input.click();
+              };
+
+              return /*#__PURE__*/_react.default.createElement("div", {
+                className: (0, _classnames.default)("d-flex flex-row justify-content-start", {
+                  'is-invalid': errors[entry]
+                })
+              }, /*#__PURE__*/_react.default.createElement("input", {
+                ref: function ref(r) {
+                  return setInput(r);
+                },
+                type: "file",
+                multiple: true,
+                className: "form-control d-none",
+                onChange: setFiles
+              }), /*#__PURE__*/_react.default.createElement("button", {
+                type: "button",
+                className: "btn btn-outline-success pl",
+                disabled: uploading,
+                onClick: trigger
+              }, uploading && /*#__PURE__*/_react.default.createElement(_reactFeather.Loader, null), !uploading && /*#__PURE__*/_react.default.createElement(_reactFeather.Upload, null), "Select file"));
+            };
+
+            return /*#__PURE__*/_react.default.createElement(BasicWrapper, {
+              entry: entry,
+              error: errors[entry],
+              label: entry,
+              help: step.help,
+              render: inputWrapper
+            }, /*#__PURE__*/_react.default.createElement(CustomizableInput, {
+              render: step.render,
+              field: _objectSpread({
+                rawValues: getValues()
+              }, field),
+              error: errors[entry]
+            }, /*#__PURE__*/_react.default.createElement(FileInput, {
+              onChange: field.onChange,
+              error: errors[entry]
+            })));
+          }
+        });
+      }
+
+      return /*#__PURE__*/_react.default.createElement(BasicWrapper, {
+        entry: entry,
+        error: errors[entry],
+        label: entry,
+        help: step.help,
+        render: inputWrapper
+      }, /*#__PURE__*/_react.default.createElement(CustomizableInput, {
+        render: step.render,
+        field: {
+          rawValues: getValues(),
+          value: getValues(entry),
+          onChange: function onChange(v) {
+            return setValue(entry, v, {
+              shouldValidate: true
+            });
+          }
+        },
+        error: errors[entry]
+      }, /*#__PURE__*/_react.default.createElement("input", _extends({}, step.props, {
+        type: "file",
+        id: entry,
+        className: (0, _classnames.default)("form-control", {
+          'is-invalid': errors[entry]
+        }),
+        readOnly: step.disabled ? 'readOnly' : null,
+        name: entry,
+        placeholder: step.placeholder
+      }, register(entry)))));
+
     default:
       return null;
   }
 };
 
-var ArrayStep = function ArrayStep(_ref11) {
-  var entry = _ref11.entry,
-      step = _ref11.step,
-      control = _ref11.control,
-      trigger = _ref11.trigger,
-      register = _ref11.register,
-      errors = _ref11.errors,
-      component = _ref11.component,
-      values = _ref11.values,
-      defaultValue = _ref11.defaultValue,
-      setValue = _ref11.setValue;
+var ArrayStep = function ArrayStep(_ref13) {
+  var entry = _ref13.entry,
+      step = _ref13.step,
+      control = _ref13.control,
+      trigger = _ref13.trigger,
+      register = _ref13.register,
+      errors = _ref13.errors,
+      component = _ref13.component,
+      values = _ref13.values,
+      defaultValue = _ref13.defaultValue,
+      setValue = _ref13.setValue;
 
   var _useFieldArray = (0, _reactHookForm.useFieldArray)({
     control: control,

@@ -94,34 +94,20 @@ var NumberResolver = /*#__PURE__*/function (_BaseResolver) {
       }
 
       if (this.min) {
-        resolver = resolver.min(this.min.value, this.min.message);
+        resolver = resolver.min(this.min.ref, this.min.message);
       }
 
       if (this.max) {
-        resolver = resolver.max(this.max.value, this.max.message);
+        resolver = resolver.min(this.max.ref, this.max.message);
       }
 
       if (this.moreThan) {
-        if (typeof this.moreThan.ref === 'string') {
-          resolver = resolver.moreThan(yup.ref(this.moreThan.ref), this.moreThan.message);
-        }
-
-        if (typeof this.moreThan.ref === 'number') {
-          resolver = resolver.moreThan(Number(this.moreThan.ref), this.moreThan.message);
-        }
-
+        resolver = resolver.moreThan(this.moreThan.ref, this.moreThan.message);
         dependencies.push([key, this.moreThan.ref]);
       }
 
       if (this.lessThan) {
-        if (typeof this.lessThan.ref === 'string') {
-          resolver = resolver.lessThan(yup.ref(this.lessThan.ref), this.lessThan.message);
-        }
-
-        if (typeof this.lessThan.ref === 'number') {
-          resolver = resolver.lessThan(this.lessThan.ref, this.lessThan.message);
-        }
-
+        resolver = resolver.lessThan(this.lessThan.ref, this.lessThan.message);
         dependencies.push([key, this.lessThan.ref]);
       }
 

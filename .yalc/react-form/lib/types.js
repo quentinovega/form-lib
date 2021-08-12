@@ -14,6 +14,7 @@ var Types = {
   number: 'number',
   bool: 'bool',
   date: 'date',
-  object: 'object'
+  object: 'object',
+  file: 'file'
 };
 exports.Types = Types;

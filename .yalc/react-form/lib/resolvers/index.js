@@ -39,6 +39,12 @@ Object.defineProperty(exports, "BooleanResolver", {
     return _booleanResolver.BooleanResolver;
   }
 });
+Object.defineProperty(exports, "FileResolver", {
+  enumerable: true,
+  get: function get() {
+    return _fileResolver.FileResolver;
+  }
+});
 
 var _numberResolver = require("./numberResolver");
 
@@ -51,3 +57,5 @@ var _dateResolver = require("./dateResolver");
 var _arrayResolver = require("./arrayResolver");
 
 var _booleanResolver = require("./booleanResolver");
+
+var _fileResolver = require("./fileResolver");

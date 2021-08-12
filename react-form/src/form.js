@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import classNames from 'classnames';
-import React, { useEffect } from 'react'
-import { HelpCircle } from 'react-feather';
+import React, { useEffect, useState } from 'react'
+import { HelpCircle, Loader, Upload } from 'react-feather';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { DatePicker } from 'react-rainbow-components';
 import ReactToolTip from 'react-tooltip';
@@ -10,7 +10,7 @@ import * as yup from "yup";
 
 import { Types } from './types';
 import { BooleanInput, Collapse, SelectInput, ObjectInput, CodeInput, MarkdownInput } from './inputs/index';
-import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver } from './resolvers/index';
+import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver, FileResolver } from './resolvers/index';
 import { option } from './Option'
 
 
@@ -43,6 +43,9 @@ export const buildSubResolver = (props, key, dependencies) => {
         break;
       case Types.date:
         resolver = new DateResolver(constraints).toResolver(key, dependencies);
+        break;
+      case Types.file:
+        resolver = new FileResolver(constraints).toResolver(key, dependencies)
         break;
       default:
         break;
@@ -312,31 +315,17 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               }}
             />
           )
-        case 'password':
-          return (
-            <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
-              <CustomizableInput render={step.render} field={{ rawValues: getValues(), value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
-                <input
-                  {...step.props}
-                  type="password" id={entry}
-                  className={classNames("form-control", { 'is-invalid': errors[entry] })}
-                  readOnly={step.disabled ? 'readOnly' : null}
-                  name={entry}
-                  placeholder={step.placeholder}
-                  {...register(entry)} />
-              </CustomizableInput>
-            </BasicWrapper>
-          );
         default:
           return (
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
               <CustomizableInput render={step.render} field={{ rawValues: getValues(), value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
                 <input
                   {...step.props}
-                  type="text" id={entry}
+                  type={step.format || 'text'} id={entry}
                   className={classNames("form-control", { 'is-invalid': errors[entry] })}
                   readOnly={step.disabled ? 'readOnly' : null}
                   name={entry}
+                  defaultValue=""
                   placeholder={step.placeholder}
                   {...register(entry)} />
               </CustomizableInput>
@@ -372,7 +361,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
         default:
           return (
             <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
-              <CustomizableInput render={step.render} field={{ rawValues: getValues(),  value: getValues(entry), onChange: v => setValue(entry, v) }} error={errors[entry]}>
+              <CustomizableInput render={step.render} field={{ rawValues: getValues(), value: getValues(entry), onChange: v => setValue(entry, v) }} error={errors[entry]}>
                 <input
                   {...step.props}
                   type="number" id={entry}
@@ -394,7 +383,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
           render={({ field }) => {
             return (
               <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
-                <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field}} error={errors[entry]}>
+                <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field }} error={errors[entry]}>
                   <BooleanInput
                     {...step.props}
                     className={classNames({ 'is-invalid': errors[entry] })}
@@ -420,7 +409,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               render={({ field }) => {
                 return (
                   <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
-                    <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field}} error={errors[entry]}>
+                    <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field }} error={errors[entry]}>
                       <SelectInput
                         {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
@@ -446,7 +435,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
               render={({ field }) => {
                 return (
                   <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
-                    <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field}} error={errors[entry]}>
+                    <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field }} error={errors[entry]}>
                       <ObjectInput
                         {...step.props}
                         className={classNames({ 'is-invalid': errors[entry] })}
@@ -472,7 +461,7 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
           render={({ field }) => {
             return (
               <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
-                <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field}} error={errors[entry]}>
+                <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field }} error={errors[entry]}>
                   <DatePicker
                     {...step.props}
                     id="datePicker-1"
@@ -489,6 +478,75 @@ const Step = ({ entry, step, errors, register, schema, control, trigger, getValu
           }}
         />
       )
+    case Types.file:
+      if (step.format === 'hidden') {
+        return (
+          <Controller
+            name={entry}
+            control={control}
+            render={({ field }) => {
+              const FileInput = ({onChange}) => {
+                const [uploading, setUploading] = useState(false);
+                const [input, setInput] = useState(undefined);
+
+                const setFiles = (e) => {
+                  const files = e.target.files;
+                  setUploading(true);
+                  onChange(files)
+                  setUploading(false);
+                };
+
+                const trigger = () => {
+                  input.click();
+                };
+
+                return (
+                  <div className={classNames("d-flex flex-row justify-content-start", { 'is-invalid': errors[entry] })}>
+                    <input
+                      ref={(r) => setInput(r)}
+                      type="file"
+                      multiple
+                      className="form-control d-none"
+                      onChange={setFiles}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-outline-success pl"
+                      disabled={uploading}
+                      onClick={trigger}>
+                      {uploading && <Loader />}
+                      {!uploading && <Upload />}
+                        Select file
+                    </button>
+                  </div>
+                );
+              };
+
+              return (
+                <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+                  <CustomizableInput render={step.render} field={{ rawValues: getValues(), ...field }} error={errors[entry]}>
+                    <FileInput onChange={field.onChange} error={errors[entry]}/>
+                  </CustomizableInput>
+                </BasicWrapper>
+              )
+            }}
+          />
+        )
+      }
+      return (
+        <BasicWrapper entry={entry} error={errors[entry]} label={entry} help={step.help} render={inputWrapper}>
+          <CustomizableInput render={step.render} field={{ rawValues: getValues(), value: getValues(entry), onChange: v => setValue(entry, v, { shouldValidate: true }) }} error={errors[entry]}>
+            <input
+              {...step.props}
+              type='file' id={entry}
+              className={classNames("form-control", { 'is-invalid': errors[entry] })}
+              readOnly={step.disabled ? 'readOnly' : null}
+              name={entry}
+              placeholder={step.placeholder}
+              {...register(entry)} />
+          </CustomizableInput>
+        </BasicWrapper>
+      );
     default:
       return null;
   }
