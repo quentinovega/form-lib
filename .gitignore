@@ -27,4 +27,5 @@ yarn-error.log*
 
 /react-form/lib
 /react-form/dist
-/.yalc/
+.yalc/
+yalc.lock
