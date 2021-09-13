@@ -3,7 +3,7 @@ import { Form, Types, constraints } from 'react-form'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-export const BackOffice = (props) => {
+export const BackOffice = () => {
 
   const [user, setUser] = useState(undefined)
 
@@ -15,9 +15,9 @@ export const BackOffice = (props) => {
       label: 'game',
       placeholder: 'url du game',
       defaultValue: 'https://foo.bar',
-      constraints: {
-        url: constraints.url()
-      },
+      constraints: [
+        constraints.url()
+      ],
     },
     name: {
       type: Types.string,
@@ -26,10 +26,9 @@ export const BackOffice = (props) => {
       help: 'nom de ton personnage',
       className: "col-6",
       style: { color: 'red' },
-
-      constraints: {
-        required: { message: "le nom est obligatoire" },
-      },
+      constraints: [
+        constraints.required("le nom est obligatoire")
+      ],
       render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
     },
     fatherName: {
@@ -39,9 +38,9 @@ export const BackOffice = (props) => {
       className: "col-6",
       style: { color: 'red' },
 
-      constraints: {
-        required: { message: "le nom du pere est obligatoire" },
-      }
+      constraints: [
+        constraints.required("le nom du pere est obligatoire"),
+      ]
     },
     fatherAge: {
       type: Types.number,
@@ -49,25 +48,24 @@ export const BackOffice = (props) => {
       placeholder: 'son age',
       help: "l'age du pere du personnage",
 
-      constraints: {
-        required: constraints.required("l'age du pere est obligatoire"),
-        min: { value: 18, message: "il doit etre majeur" },
-        max: constraints.max(1000, "il doit etre en vie"),
-        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
-        // positive: positive("un age negatif ? il est pas né ton perso ????"),
-      }
+      constraints: [
+        constraints.required("l'age du pere est obligatoire"),
+        constraints.min(18, "il doit etre majeur"),
+        constraints.max(1000, "il doit etre en vie"),
+        constraints.integer("les demi-années ne compte pas vraiment...gamin"),
+        constraints.positive("un age negatif ? il est pas né ton perso ????"),
+      ]
     },
     age: {
       type: Types.number,
       label: 'age',
       placeholder: 'son age',
       help: "l'age du personnage",
-
-      constraints: {
-        required: constraints.required("l'age est obligatoire"),
-        lessThan: constraints.lessThan('fatherAge', 'un fils est plus jeune que son père'),
-        integer: constraints.integer("les demi-années ne compte pas vraiment...gamin"),
-      }
+      constraints: [
+        constraints.required("l'age est obligatoire"),
+        constraints.lessThan(constraints.ref('fatherAge'), 'un fils est plus jeune que son père'),
+        constraints.integer("les demi-années ne compte pas vraiment...gamin"),
+      ]
     },
     bio: {
       type: Types.string,
@@ -110,24 +108,21 @@ export const BackOffice = (props) => {
       help: "le genre du perso personnage",
       // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
       options: ["male", "female", "non-binary"],
-      constraints: {
-        required: constraints.required("le genre est obligatoire"),
-      }
-
+      constraints: [
+        constraints.required("le genre est obligatoire"),
+      ]
     },
-
     species: {
       type: Types.string,
       visible: { ref: 'human', test: is => !is },
       label: 'Espèce du perso.',
       help: "l'espece du perso personnage car non humain",
-      constraints: {
-        when: constraints.when('human', is => !is, {
-          required: constraints.required("l'espece est requise si non-humain"),
+      constraints: [
+        constraints.when('human', is => !is, [
           // oneOf: constraints.oneOf(["elf", "orc", "semi-dragon", "wererat"], "l'espece doit etre particuliere")
-        })
-      }
-
+          constraints.required("l'espece est requise si non-humain"),
+        ])
+      ]
     },
     weapons: {
       type: Types.object,
@@ -154,13 +149,12 @@ export const BackOffice = (props) => {
       //     type: Types.string
       //   }
       // },
-      constraints: {
-        // min: constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
-        length: constraints.length(2, '2 armes obligatoire'),
-        test: constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100) //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200 
+      constraints: [
+        constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
+        constraints.length(2, '2 armes obligatoire'),
+        constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100) //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200 
         //todo: tester when en fonction de l'age
-      },
-
+      ]
       // createOption: true,
 
     },
@@ -168,10 +162,10 @@ export const BackOffice = (props) => {
       type: Types.date,
       label: 'date d\'anniv',
       help: "la date de naissance du personnage",
-      constraints: {
-        required: constraints.required('required'),
-        max: constraints.max(new Date(), 'pas de naissance dans le futur'),
-      }
+      constraints: [
+        constraints.required('required'),
+        constraints.max(new Date(), 'pas de naissance dans le futur'),
+      ]
     },
     city: {
       type: Types.string,
@@ -180,9 +174,9 @@ export const BackOffice = (props) => {
       help: 'Ville de résidence',
       transformer: (value) => ({ label: value.label, value: value.id }),
       options: [{ label: 'Neo-Tokyo', id: 1 }, { label: 'Asgard', id: 2 }, { label: 'Fondcombe', id: 3 }],
-      constraints: {
-        required: constraints.required(`Personne n'habite nulle-part jsuqu'à preuve du contraire`)
-      }
+      constraints: [
+        constraints.required(`Personne n'habite nulle-part jsuqu'à preuve du contraire`)
+      ]
     },
     abilities: {
       type: Types.string,
@@ -191,16 +185,16 @@ export const BackOffice = (props) => {
       help: "abilities help..",
       schema: {
         type: Types.string,
-        constraints: {
-          required: constraints.required('required'),
-          min: constraints.min(4, 'au moins 4 lettres'),
-        }
+        constraints: [
+          constraints.required('required'),
+          constraints.min(4, 'au moins 4 lettres'),
+        ]
       },
-      constraints: {
-        length: constraints.length(3, '3 abilities obligatoire'),
-        max: constraints.max(10, "max 10")
+      constraints: [
+        constraints.length(3, '3 abilities obligatoire'),
+        constraints.max(10, "max 10")
         // moreThan: constraints.length(2, '2 abilities min obligatoire')
-      },
+      ],
       render: (props) => {
         return <div className="d-flex">
           <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
@@ -219,49 +213,47 @@ export const BackOffice = (props) => {
         air: '',
         lightning: ''
       },
-      constraints: {
-        required: constraints.required('incancantation requises'),
-        test: [
-          constraints.test("power", 'incantation requise a minima', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) > 0),
-          constraints.test("power", 'pas plus de 100 de pouvoir', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) <= 100)
-        ]
-      }
+      constraints: [
+        constraints.required('incancantation requises'),
+        constraints.test("power", 'incantation requise a minima', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) > 0),
+        constraints.test("power", 'pas plus de 100 de pouvoir', value => (Object.values(value) || []).reduce((a, c) => a + Number(c), 0) <= 100)
+      ]
     },
     code: {
       type: Types.string,
       format: 'markdown',
       label: 'just code',
       help: 'Juste du code, hop hop hop',
-      constraints: {
-        required: constraints.required('le code est requis merci')
-      }
+      constraints: [
+        constraints.required('le code est requis merci')
+      ]
     },
     password: {
       type: Types.string,
       format: 'password',
       label: 'password',
-      constraints: {
-        required: constraints.required('password is required')
-      }
+      constraints: [
+        constraints.required('password is required')
+      ]
     },
     confirmPassword: {
       type: Types.string,
       format: 'password',
       label: 'confirm password',
-      constraints: {
-        required: constraints.required('confirm password is required'),
-        oneOf: constraints.oneOf([constraints.ref('password')], 'confirm and password must be equal')
-      }
+      constraints: [
+        constraints.required('confirm password is required'),
+        constraints.oneOf([constraints.ref('password')], 'confirm and password must be equal')
+      ]
     },
     avatar: {
       type: Types.file,
       format: 'hidden',
       label: 'avatar',
-      constraints: {
-        required: constraints.required('your avatar is not set'),
-        maxSize: constraints.maxSize(2000000, 'no more than 2 Mo please'),
-        supportedFormat: constraints.supportedFormat(['jpeg'], 'just jpeg or png file please')
-      }
+      constraints: [
+        constraints.required('your avatar is not set'),
+        constraints.maxSize(2000000, 'no more than 2 Mo please'),
+        constraints.supportedFormat(['jpeg', 'jpg', 'png'], 'just jpeg or png file please')
+      ]
     }
   }
 
@@ -269,25 +261,27 @@ export const BackOffice = (props) => {
     'bio',
     'game',
     'name',
-    // 'age',
-    // 'city',
-    // {
-    //   label: 'pere du personnage',
-    //   flow: [
-    //     'fatherName',
-    //     'fatherAge'
-    //   ],
-    //   collapsed: true
-    // },
-    // 'human',
-    // 'species',
-    // 'genre',
-    // 'weapons',
-    // 'birthday',
-    // 'abilities',
-    // 'spells',
-    // 'code'
-    'avatar'
+    'age',
+    'city',
+    {
+      label: 'pere du personnage',
+      flow: [
+        'fatherName',
+        'fatherAge'
+      ],
+      collapsed: true
+    },
+    'human',
+    'species',
+    'genre',
+    'weapons',
+    'birthday',
+    'abilities',
+    'spells',
+    'code',
+    'avatar',
+    // 'password',
+    // 'confirmPassword'
   ];
 
   const thor = {
@@ -348,7 +342,7 @@ export const BackOffice = (props) => {
           onChange={item => console.log({ item })}
           value={user}
           // inputWrapper={Wrapper}
-          footer={({reset, valid}) => {
+          footer={({ reset, valid }) => {
             return (
               <div className="d-flex justify-content-end">
                 <button className="btn btn-primary m-3" onClick={reset}>reset</button>

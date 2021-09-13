@@ -10,61 +10,8 @@ import * as yup from "yup";
 
 import { Types } from './types';
 import { BooleanInput, Collapse, SelectInput, ObjectInput, CodeInput, MarkdownInput } from './inputs/index';
-import { StringResolver, NumberResolver, ObjectResolver, DateResolver, BooleanResolver, ArrayResolver, FileResolver } from './resolvers/index';
+import { getShapeAndDependencies } from './resolvers/index';
 import { option } from './Option'
-
-
-export const buildSubResolver = (props, key, dependencies) => {
-  let resolver;
-  const { type, constraints = {} } = props;
-  if (props.format === 'array' || props.isMulti) {
-    let subResolver;
-
-    if (props.schema && props.schema.type) {
-      subResolver = buildSubResolver(props.schema, key, dependencies)
-    } else if (props.schema) {
-      resolver = getShapeAndDependencies(Object.keys(props.schema), props.schema, dependencies)
-      subResolver = yup.object().shape(resolver, dependencies);
-    }
-    resolver = new ArrayResolver(constraints).toResolver(subResolver, key, dependencies);
-  } else {
-    switch (type) {
-      case Types.string:
-        resolver = new StringResolver(constraints).toResolver(key, dependencies);
-        break;
-      case Types.number:
-        resolver = new NumberResolver(constraints).toResolver(key, dependencies);
-        break;
-      case Types.bool:
-        resolver = new BooleanResolver(constraints).toResolver(key, dependencies);
-        break;
-      case Types.object:
-        resolver = new ObjectResolver(constraints).toResolver(key, dependencies);
-        break;
-      case Types.date:
-        resolver = new DateResolver(constraints).toResolver(key, dependencies);
-        break;
-      case Types.file:
-        resolver = new FileResolver(constraints).toResolver(key, dependencies)
-        break;
-      default:
-        break;
-    }
-  }
-  return resolver
-}
-
-export const getShapeAndDependencies = (flow, schema, dependencies = []) => {
-  const shape = flow.reduce((resolvers, key) => {
-    if (typeof key === 'object') {
-      return { ...resolvers, ...getShapeAndDependencies(key.flow, schema, dependencies).shape }
-    }
-    const resolver = buildSubResolver(schema[key], key, dependencies);
-    return { ...resolvers, [key]: resolver }
-  }, {})
-
-  return { shape, dependencies }
-}
 
 
 const BasicWrapper = ({ entry, label, error, help, children, render }) => {

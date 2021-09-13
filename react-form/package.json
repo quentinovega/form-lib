@@ -9,7 +9,27 @@
     "build:lib": "babel src --extensions \".ts,.js\" --out-dir lib",
     "build:types": "tsc --declaration --emitDeclarationOnly ",
     "bundle": "cross-env NODE_ENV=production webpack --color --progress",
-    "build": "yarn bundle && yarn build:lib && yarn build:types"
+    "build": "yarn bundle && yarn build:lib && yarn build:types",
+    "test": "jest",
+    "tdd": "jest --watch"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|less|sass|scss)$": "<rootDir>/__mocks__/styleMock.js"
+    },
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "./test-setup.js"
+    ],
+    "roots": [
+      "test"
+    ],
+    "testRegex": "\\.spec.js$",
+    "testPathIgnorePatterns": [
+      "helpers\\.js",
+      "\\.eslintrc\\.js",
+      "types\\.ts"
+    ]
   },
   "peerDependencies": {
     "react": "^17.0.2",
@@ -40,8 +60,14 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.15.0",
     "babel-loader": "8.2.2",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
     "cross-env": "5.0.1",
     "css-loader": "5.2.0",
+    "dirty-chai": "^2.0.1",
+    "jest": "^27.0.6",
+    "sinon": "^11.1.2",
+    "sinon-chai": "^3.7.0",
     "style-loader": "2.0.0",
     "transform-loader": "0.2.4",
     "ts-loader": "9.2.5",
