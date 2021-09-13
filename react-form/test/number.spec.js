@@ -25,101 +25,101 @@ describe('Number resolver', () => {
 
     return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
   })
-  // it('should resolve positive constraints', () => {
+  it('should resolve positive constraints', () => {
 
-  //   const errorMessage = "not positive";
-  //   const testConstraints = {
-  //     required: constraints.positive(errorMessage)
-  //   }
+    const errorMessage = "not positive";
+    const testConstraints = [
+      constraints.positive(errorMessage)
+    ]
 
-  //   const right = { test: 42 }
-  //   const wrong = { test: -42 }
+    const right = { test: 42 }
+    const wrong = { test: -42 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
-  // it('should resolve negative constraints', () => {
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
+  it('should resolve negative constraints', () => {
 
-  //   const errorMessage = "not negative";
-  //   const testConstraints = {
-  //     required: constraints.negative(errorMessage)
-  //   }
+    const errorMessage = "not negative";
+    const testConstraints = [
+      constraints.negative(errorMessage)
+    ]
 
-  //   const right = { test: -42 }
-  //   const wrong = { test: 42 }
+    const right = { test: -42 }
+    const wrong = { test: 42 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
-  // it('should resolve min constraints', () => {
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
+  it('should resolve min constraints', () => {
 
-  //   const errorMessage = "there is a min condition";
-  //   const testConstraints = {
-  //     required: constraints.min(40, errorMessage)
-  //   }
+    const errorMessage = "there is a min condition";
+    const testConstraints = [
+      constraints.min(40, errorMessage)
+    ]
 
-  //   const right = { test: 42 }
-  //   const wrong = { test: 2 }
+    const right = { test: 42 }
+    const wrong = { test: 2 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
-  // it('should resolve max constraints', () => {
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
+  it('should resolve max constraints', () => {
 
-  //   const errorMessage = "there is a max condition";
-  //   const testConstraints = {
-  //     required: constraints.max(44, errorMessage)
-  //   }
+    const errorMessage = "there is a max condition";
+    const testConstraints = [
+      constraints.max(44, errorMessage)
+    ]
 
-  //   const right = { test: 42 }
-  //   const wrong = { test: 45 }
+    const right = { test: 42 }
+    const wrong = { test: 45 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
-  // it('should resolve moreThan constraints with ref', () => {
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
+  it('should resolve moreThan constraints with ref', () => {
 
-  //   const errorMessage = "not more than value";
-  //   const testConstraints = {
-  //     required: constraints.moreThan(constraints.ref('value'), errorMessage)
-  //   }
+    const errorMessage = "not more than value";
+    const testConstraints = [
+      constraints.moreThan(constraints.ref('value'), errorMessage)
+    ]
 
-  //   const right = { test: 42, value: 40 }
-  //   const wrong = { test: 38, value: 40 }
+    const right = { test: 42, value: 40 }
+    const wrong = { test: 38, value: 40 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
-  // it('should resolve moreThan constraints', () => {
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
+  it('should resolve moreThan constraints', () => {
 
-  //   const errorMessage = "not more than value";
-  //   const testConstraints = {
-  //     required: constraints.moreThan(40, errorMessage)
-  //   }
+    const errorMessage = "not more than value";
+    const testConstraints = [
+      constraints.moreThan(40, errorMessage)
+    ]
 
-  //   const right = { test: 42 }
-  //   const wrong = { test: 38 }
+    const right = { test: 42 }
+    const wrong = { test: 38 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
-  // it('should resolve lessThan constraints with ref', () => {
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
+  it('should resolve lessThan constraints with ref', () => {
 
-  //   const errorMessage = "not less than value";
-  //   const testConstraints = {
-  //     required: constraints.lessThan(constraints.ref('value'), errorMessage)
-  //   }
+    const errorMessage = "not less than value";
+    const testConstraints = [
+      constraints.lessThan(constraints.ref('value'), errorMessage)
+    ]
 
-  //   const right = { test: 42, value: 44 }
-  //   const wrong = { test: 46, value: 44 }
+    const right = { test: 42, value: 44 }
+    const wrong = { test: 46, value: 44 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
-  // it('should resolve lessThan constraints', () => {
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
+  it('should resolve lessThan constraints', () => {
 
-  //   const errorMessage = "not less than value";
-  //   const testConstraints = {
-  //     required: constraints.lessThan(44, errorMessage)
-  //   }
+    const errorMessage = "not less than value";
+    const testConstraints = [
+      constraints.lessThan(44, errorMessage)
+    ]
 
-  //   const right = { test: 42 }
-  //   const wrong = { test: 46 }
+    const right = { test: 42 }
+    const wrong = { test: 46 }
 
-  //   return testBasicConstraints(testConstraints, errorMessage, right, wrong)
-  // })
+    return testBasicConstraints(testConstraints, errorMessage, right, wrong, 'number')
+  })
 })
 
