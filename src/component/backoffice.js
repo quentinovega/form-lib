@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Types, constraints } from 'react-form'
+import { Form, types, constraints } from '@maif/react-forms'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
+// import 'bootstrap/dist/css/bootstrap.min.css'
 
 export const BackOffice = () => {
 
@@ -9,7 +9,7 @@ export const BackOffice = () => {
 
   const formSchema = {
     game: {
-      type: Types.string,
+      type: types.string,
       disabled: true,
       // format: 'password',
       label: 'game',
@@ -20,19 +20,20 @@ export const BackOffice = () => {
       ],
     },
     name: {
-      type: Types.string,
-      label: 'name',
+      type: types.string,
+      label: 'your name',
       placeholder: 'Nom de ton perso',
       help: 'nom de ton personnage',
       className: "col-6",
       style: { color: 'red' },
       constraints: [
-        constraints.required("le nom est obligatoire")
+        constraints.required("le nom est obligatoire"),
+        constraints.length(7, "le nom est doit etre long de 7"),
       ],
-      render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
+      // render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
     },
     fatherName: {
-      type: Types.string,
+      type: types.string,
       label: 'name',
       placeholder: 'Nom du pere du perso',
       className: "col-6",
@@ -43,7 +44,7 @@ export const BackOffice = () => {
       ]
     },
     fatherAge: {
-      type: Types.number,
+      type: types.number,
       label: 'age',
       placeholder: 'son age',
       help: "l'age du pere du personnage",
@@ -57,10 +58,10 @@ export const BackOffice = () => {
       ]
     },
     age: {
-      type: Types.number,
+      type: types.number,
       label: 'age',
       placeholder: 'son age',
-      help: "l'age du personnage",
+      help: "l'age du personnage l'age du personnage l'age du personnage l'age du personnage v l'age du personnage l'age du personnage l'age du personnage l'age du personnage",
       constraints: [
         constraints.required("l'age est obligatoire"),
         constraints.lessThan(constraints.ref('fatherAge'), 'un fils est plus jeune que son père'),
@@ -68,7 +69,7 @@ export const BackOffice = () => {
       ]
     },
     bio: {
-      type: Types.string,
+      type: types.string,
       format: 'text',
       label: 'biographie',
       placeholder: 'raconte ton histoire',
@@ -80,7 +81,7 @@ export const BackOffice = () => {
       }
     },
     human: {
-      type: Types.bool, //todo: cool si on peu chainer des input ==> input pour le nom de l'espece du perso (option visible peut etre avec une fonction)
+      type: types.bool, //todo: cool si on peu chainer des input ==> input pour le nom de l'espece du perso (option visible peut etre avec une fonction)
       label: 'is human ?',
       help: "le personnage est il humain",
       defaultValue: false,
@@ -102,7 +103,7 @@ export const BackOffice = () => {
       // </div>
     },
     genre: {
-      type: Types.string,
+      type: types.string,
       format: 'select',
       label: 'genre',
       help: "le genre du perso personnage",
@@ -113,7 +114,7 @@ export const BackOffice = () => {
       ]
     },
     species: {
-      type: Types.string,
+      type: types.string,
       visible: { ref: 'human', test: is => !is },
       label: 'Espèce du perso.',
       help: "l'espece du perso personnage car non humain",
@@ -124,8 +125,8 @@ export const BackOffice = () => {
         ])
       ]
     },
-    weapons: {
-      type: Types.object,
+    weapon: {
+      type: types.object,
       format: 'select',
       isMulti: true,
       label: 'armes',
@@ -140,13 +141,13 @@ export const BackOffice = () => {
       // FIXME: if we provide a schema yup is broken
       // schema: {
       //   label: {
-      //     type: Types.string,
+      //     type: types.string,
       //   },
       //   weight: {
-      //     type: Types.number
+      //     type: types.number
       //   },
       //   rarity: {
-      //     type: Types.string
+      //     type: types.string
       //   }
       // },
       constraints: [
@@ -158,8 +159,62 @@ export const BackOffice = () => {
       // createOption: true,
 
     },
+    weapons: {
+      type: types.object,
+      format: 'form',
+      // array: true,
+      label: 'armes',
+      help: "les armes du perso personnage",
+      // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
+      // transformer: (value) => ({label: value.weight, value: value.label}),
+      // options: [
+      //   { label: "toothpick", weight: 0, rarity: 'common' },
+      //   { label: "sword", weight: 2, rarity: 'common' }, 
+      //   { label: "bazooka", weight: 10, rarity: 'epic' },
+      //   { label: "excalibur", weight: 100, rarity: 'legendary' }],
+      schema: {
+        label: {
+          type: types.string,
+          label: "label",
+          help: "help",
+          constraints: [
+            constraints.required('label is required')
+          ],
+          // render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
+        },
+        weight: {
+          type: types.number,
+          label: "weight",
+          constraints: [
+            constraints.max('100', 'a weight cannot be heavier than 100')
+          ]
+        },
+        rarity: {
+          type: types.string,
+          label: "rarity",
+          constraints: [
+            constraints.oneOf(['common', 'rare', 'epic', 'legendary'], 'one of rarity please..common, rare, epic or legendary')
+          ]
+        }
+      },
+      flow: ["label", "weight", "rarity"],
+      collapsable: true,
+      fieldOnCollapse: "label", 
+      constraints: [
+        // constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
+        // constraints.length(2, '2 armes obligatoire'),
+        // constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100) //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200 
+        //todo: tester when en fonction de l'age
+      ],
+      // createOption: true,
+      // defaultValue: {label: "foo", weight: 0, rarity: 'common'}
+
+    },
+
+
+
     birthday: {
-      type: Types.date,
+      type: types.date,
       label: 'date d\'anniv',
       help: "la date de naissance du personnage",
       constraints: [
@@ -167,8 +222,29 @@ export const BackOffice = () => {
         constraints.max(new Date(), 'pas de naissance dans le futur'),
       ]
     },
+    zipcode: {
+      type: types.string,
+      label: 'code postal',
+      switch: {
+        ref: 'country',
+        render: [
+          {
+            default: true,
+            condition: ({ ref }) => ref === 'france',
+            type: types.number,
+          }, {
+            default: true,
+            condition: ({ ref }) => ref !== 'france',
+            type: types.string,
+          }
+        ]
+      },
+      constraints: [
+        constraints.length(5, 'en france 5 chiffre')
+      ]
+    },
     city: {
-      type: Types.string,
+      type: types.string,
       format: 'select',
       label: 'ville',
       help: 'Ville de résidence',
@@ -179,12 +255,12 @@ export const BackOffice = () => {
       ]
     },
     abilities: {
-      type: Types.string,
-      format: 'array',
+      type: types.string,
+      array: true,
       label: 'abilities du perso',
       help: "abilities help..",
       schema: {
-        type: Types.string,
+        type: types.string,
         constraints: [
           constraints.required('required'),
           constraints.min(4, 'au moins 4 lettres'),
@@ -195,17 +271,17 @@ export const BackOffice = () => {
         constraints.max(10, "max 10")
         // moreThan: constraints.length(2, '2 abilities min obligatoire')
       ],
-      render: (props) => {
-        return <div className="d-flex">
-          <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
-          {props.error && <div style={{ color: 'tomato' }}>{props.error.message}</div>}
-        </div>
-      }
+      // render: (props) => {
+      //   return <div className="d-flex">
+      //     <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
+      //     {props.error && <div style={{ color: 'tomato' }}>{props.error.message}</div>}
+      //   </div>
+      // }
     },
     spells: {
-      type: Types.object,
+      type: types.object,
       label: 'incantations',
-      help: 'Incantation sous form d\'objet {nom, puissance (*/100)} max opuissnce total = 100',
+      help: 'Incantation sous form d\'objet {nom, puissance (*/100)} max puissnce total = 100',
       defaultKeyValue: { 'spellName': 50 },
       defaultValue: {
         ice: '',
@@ -220,7 +296,7 @@ export const BackOffice = () => {
       ]
     },
     code: {
-      type: Types.string,
+      type: types.string,
       format: 'markdown',
       label: 'just code',
       help: 'Juste du code, hop hop hop',
@@ -229,7 +305,7 @@ export const BackOffice = () => {
       ]
     },
     password: {
-      type: Types.string,
+      type: types.string,
       format: 'password',
       label: 'password',
       constraints: [
@@ -237,7 +313,7 @@ export const BackOffice = () => {
       ]
     },
     confirmPassword: {
-      type: Types.string,
+      type: types.string,
       format: 'password',
       label: 'confirm password',
       constraints: [
@@ -246,7 +322,7 @@ export const BackOffice = () => {
       ]
     },
     avatar: {
-      type: Types.file,
+      type: types.file,
       format: 'hidden',
       label: 'avatar',
       constraints: [
@@ -254,34 +330,106 @@ export const BackOffice = () => {
         constraints.maxSize(2000000, 'no more than 2 Mo please'),
         constraints.supportedFormat(['jpeg', 'jpg', 'png'], 'just jpeg or png file please')
       ]
+    },
+    armor: {
+      type: types.object,
+      format: 'form',
+      label: 'test',
+      conditionalSchema: {
+        ref: 'genre',
+        switch: [
+          {
+            default: true,
+            condition: ({ref}) => ref === 'male',
+            schema: {
+              casque: {
+                type: types.string,
+                label: "casque",
+                constraints: [
+                  constraints.required('your casque is not set'),
+                ]
+              },
+              armure: {
+                type: types.string,
+                label: "armure"
+              }
+            },
+            flow: ["casque", "armure"]
+          },
+          {
+            condition: 'female',
+            schema: {
+              haut: {
+                type: types.string,
+                label: "haut",
+                constraints: [
+                  constraints.required('your haut is not set'),
+                ]
+              },
+              bas: {
+                type: types.string,
+                label: "bas",
+                constraints: [
+                  constraints.length(6, 'your bas must ben 6 length'),
+                ]
+              }
+            },
+            flow: ["haut", "bas"]
+          },
+          {
+            condition: 'non-binary',
+            schema: {
+              casque: {
+                type: types.string,
+                label: "casque"
+              },
+              armure: {
+                type: types.string,
+                label: "armure"
+              },
+              haut: {
+                type: types.string,
+                label: "haut"
+              },
+              bas: {
+                type: types.string,
+                label: "bas"
+              }
+            },
+            flow: ["casque", "armure", "haut", "bas"]
+          }
+        ]
+      }
+      
     }
   }
 
   const formFlow = [
-    'bio',
-    'game',
+    // 'bio',
+    // 'game',
     'name',
-    'age',
-    'city',
-    {
-      label: 'pere du personnage',
-      flow: [
-        'fatherName',
-        'fatherAge'
-      ],
-      collapsed: true
-    },
-    'human',
-    'species',
+    // 'age',
+    // 'city',
+    // {
+    //   label: 'pere du personnage',
+    //   flow: [
+    //     'fatherName',
+    //     'fatherAge'
+    //   ],
+    //   collapsed: true
+    // },
+    // 'human',
+    // 'species',
     'genre',
-    'weapons',
-    'birthday',
-    'abilities',
-    'spells',
-    'code',
-    'avatar',
+    // 'weapons',
+    // 'birthday',
+    // 'abilities',
+    // 'spells',
+    // 'code',
+    // 'avatar',
     // 'password',
-    // 'confirmPassword'
+    // 'confirmPassword',
+    'armor'
   ];
 
   const thor = {
@@ -295,7 +443,8 @@ export const BackOffice = () => {
     human: true,
     species: undefined,
     genre: 'male',
-    weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "Mjolnir", weight: 100, rarity: 'legendary' }],
+    weapon: { label: "toothpick", weight: 0, rarity: 'common' },
+    // test: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "Mjolnir", weight: 100, rarity: 'legendary' }],
     birthday: new Date('August 19, 1975 23:15:30'),
     abilities: ['Brave', 'Fair', 'Worthy'],
     spells: { linghtningBolt: 100 }
@@ -312,7 +461,8 @@ export const BackOffice = () => {
     human: true,
     species: undefined,
     genre: 'male',
-    weapons: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
+    weapon: { label: "toothpick", weight: 0, rarity: 'common' },
+    // test: [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
     birthday: new Date('August 19, 1985 23:15:30'),
     abilities: ['Vile', 'Unfair', 'Unworthy'],
     spells: { fakeSnake: 10, hypnosis: 70, realityChanging: 20 }
@@ -339,17 +489,22 @@ export const BackOffice = () => {
         <Form
           schema={formSchema}
           flow={formFlow}
-          onChange={item => console.log({ item })}
-          value={user}
-          // inputWrapper={Wrapper}
-          footer={({ reset, valid }) => {
-            return (
-              <div className="d-flex justify-content-end">
-                <button className="btn btn-primary m-3" onClick={reset}>reset</button>
-                <button className="btn btn-success m-3" onClick={valid}>accept</button>
-              </div>
-            )
+          onChange={item => {
+            console.group('*** Submitted ***')
+            console.error({ item })
+            console.groupend()
           }}
+          value={user}
+          // autosave={true}
+          // inputWrapper={Wrapper}
+          // footer={({ reset, valid }) => {
+          //   return (
+          //     <div className="d-flex justify-content-end">
+          //       <button className="btn btn-primary m-3" onClick={reset}>reset</button>
+          //       <button className="btn btn-success m-3" onClick={valid}>accept</button>
+          //     </div>
+          //   )
+          // }}
         // httpClient={(url, method) => fetch(url, {
         //   method,
         //   headers: {

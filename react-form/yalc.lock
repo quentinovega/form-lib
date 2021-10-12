@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "packages": {
-    "react-form": {
-      "signature": "100b1941377e272f298b5f166a66fc81",
-      "file": true
-    }
-  }
-}
