@@ -16,7 +16,7 @@ jobs:
       id: fmt
       run: |
         git diff --numstat | wc -l
-        echo '::set-output name=DIFF::$(git diff --numstat | wc -l)'
+        echo '::set-output name=DIFF::git diff --numstat | wc -l'
     - name: Commit formatted sources
       if: steps.fmt.outputs.DIFF != '0'
       run: |
