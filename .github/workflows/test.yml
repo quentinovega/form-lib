@@ -15,10 +15,10 @@ jobs:
     - name: format sources
       id: fmt
       run: |
-        echo "::set-output name=DIFF::30"
+        echo '::set-output name=SELECTED_COLOR::green'
     - name: Commit formatted sources
       if: steps.fmt.outputs.DIFF != '0'
       run: |
-        echo "${steps.fmt.outputs.DIFF}"
+        echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
         
         
