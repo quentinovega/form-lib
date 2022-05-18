@@ -15,7 +15,7 @@ jobs:
     - name: format sources
       id: fmt
       run: |
-        echo '::set-output name=DIFF::green'
+        echo '::set-output name=DIFF::42'
     - name: Commit formatted sources
       if: steps.fmt.outputs.DIFF != '0'
       run: |
