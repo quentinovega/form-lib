@@ -14,8 +14,10 @@ jobs:
     - uses: technote-space/get-diff-action@v4
       id: git-diff
     - name: Commit formatted sources
-      if: steps.git-diff.outputs.diff
       run: |
+        echo '${{ env.GIT_DIFF }}' | jq .
+        echo '${{ steps.git-diff.outputs.diff }}' | jq .
+        echo '${{ steps.git-diff.outputs.count }}' | jq .
         echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
         
         
