@@ -13,6 +13,8 @@ jobs:
       run: echo 'format source'
     - uses: technote-space/get-diff-action@v4
       id: git-diff
+      with:
+        PATTERNS: +(src|__tests__)/**/*.ts
     - name: Commit formatted sources
       run: |
         echo '${{ env.GIT_DIFF }}' | jq .
