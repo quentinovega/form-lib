@@ -1,36 +1,71 @@
 import React, { useState, useRef } from 'react';
 import { Form, type, constraints, format } from '@maif/react-forms'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
+import '@maif/react-forms/lib/index.css'
+
+export const Option = (x) => (x === undefined || x === null ? None : Some(x));
+
+export const Some = (x) => ({
+  map: (f) => Option(f(x)),
+  flatMap: (f) => f(x),
+  fold: (_ifEmpty, f) => f(x),
+  orElse: () => Option(x),
+  getOrElse: () => x,
+  getOrNull: () => x,
+  isDefined: true,
+  exists: (f) => Option(f(x)).isDefined,
+});
+
+export const None = {
+  map: () => None,
+  flatMap: () => None,
+  fold: (ifEmpty, _f) => ifEmpty(),
+  orElse: (x) => Option(x),
+  getOrElse: (ifEmpty) => ifEmpty,
+  getOrNull: () => undefined,
+  isDefined: false,
+  exists: () => false,
+};
+
 
 export const BackOffice = () => {
+  const [value, setValue] = useState({})
 
   const [user, setUser] = useState(undefined)
+  const [state, setState] = useState('creation');
+  const [error, setError] = useState(undefined)
   const [genres, setGenres] = useState([{ value: "male", label: "masculin" }, { value: "female", label: "feminin" }, { value: "non-binary", label: "non-binaire" }])
+
+
+  const [schema, setSchema] = useState()
 
   const formSchema = {
     game: {
       type: type.string,
-      disabled: true,
+      // disabled: true,
       // format: 'password',
       label: 'game',
       placeholder: 'url du game',
       defaultValue: 'https://foo.bar',
-      // constraints: [
-      //   constraints.url()
-      // ],
+      constraints: [
+        constraints.matches(/^(https?:\/\/|\/)\w+\.[^\s]+$|^\/[^\s]*$/mg, "une url hophop hop")
+      ],
     },
     name: {
       type: type.string,
       label: 'your name',
       placeholder: 'Nom de ton perso',
       help: 'nom de ton personnage',
-      className: "col-6",
-      style: { color: 'red' },
-      constraints: [
-        constraints.required("le nom est obligatoire")
-      ],
-      // render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
+      // className: "col-6",
+      // style: { color: 'red' },
+      // constraints: [
+      //   constraints.required("le nom est requis"),
+      //   constraints.test(
+      //     'reservedChar',
+      //     `Some character ar reserved for name (${['a', 'z'].join(',')})`,
+      //     name => (name || '').split('').every((c) => !['a', 'z'].includes(c)))
+      // ],
+      render: (props) => <input type="text" className="is-invalid" style={{ borderColor: 'forestgreen' }} value={props.value} onChange={e => props.onChange(e.target.value)} />
     },
     fatherName: {
       type: type.string,
@@ -71,41 +106,44 @@ export const BackOffice = () => {
     },
     bio: {
       type: type.string,
-      format: 'text',
+      format: format.markdown,
       label: 'biographie',
       placeholder: 'raconte ton histoire',
       help: "bio du personnage",
       defaultValue: "biographie",
       props: {
-        rows: 10,
-        cols: 70
-      }
+        theme: 'tomorrow'
+      },
+      constraints: [
+        constraints.required("la bio est obligatoire"),
+      ]
     },
     human: {
       type: type.bool, //todo: cool si on peu chainer des input ==> input pour le nom de l'espece du perso (option visible peut etre avec une fonction)
-      label: 'is human ?',
-      help: "le personnage est il humain",
+      label: 'est ce qu\'il est humain ?',
+      help: null,
       defaultValue: false,
       // render: props => <div>
       //   <div className="form-check">
       //     <input className="form-check-input" type="radio" name="exampleRadios" id="isHuman" value={'true'} checked={!!props.value ? 'checked' : null}
       //       onChange={() => props.onChange(true)} />
-      //     <label className ="form-check-label" htmlFor="isHuman">
-      //     Oui
+      //     <label className="form-check-label" htmlFor="isHuman">
+      //       Oui
       //     </label>
       //   </div>
       //   <div className="form-check">
       //     <input className="form-check-input" type="radio" name="exampleRadios" id="isNotHuman" value={'false'} checked={!!props.value ? null : 'checked'}
-      //       onChange={() => props.onChange(false)}/>
+      //       onChange={() => props.onChange(false)} />
       //     <label className="form-check-label" htmlFor="isNotHuman">
-      //     Non
+      //       Non
       //     </label>
       //   </div>
       // </div>
     },
     genre: {
       type: type.string,
-      format: 'select',
+      format: format.buttonsSelect,
+      // isMulti: true,
       createOption: true,
       label: 'genre',
       help: "le genre du perso personnage",
@@ -126,7 +164,7 @@ export const BackOffice = () => {
       help: "l'espece du perso personnage car non humain",
       constraints: [
         constraints.when('human', is => !is, [
-          // oneOf: constraints.oneOf(["elf", "orc", "semi-dragon", "wererat"], "l'espece doit etre particuliere")
+          constraints.oneOf(["elf", "orc", "semi-dragon", "wererat"], "l'espece doit etre particuliere"),
           constraints.required("l'espece est requise si non-humain"),
         ])
       ]
@@ -164,60 +202,75 @@ export const BackOffice = () => {
     //     constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100) //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200 
     //     //todo: tester when en fonction de l'age
     //   ]
-    //   // createOption: true,
+    // createOption: true,
 
     // },
-    // weaponsForm: {
-    //   type: type.object,
-    //   format: format.form,
-    //   array: true,
-    //   label: 'armes',
-    //   help: "les armes du perso personnage",
-    //   // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
-    //   // transformer: (value) => ({label: value.weight, value: value.label}),
-    //   // options: [
-    //   //   { label: "toothpick", weight: 0, rarity: 'common' },
-    //   //   { label: "sword", weight: 2, rarity: 'common' }, 
-    //   //   { label: "bazooka", weight: 10, rarity: 'epic' },
-    //   //   { label: "excalibur", weight: 100, rarity: 'legendary' }],
-    //   schema: {
-    //     label: {
-    //       type: type.string,
-    //       label: "label",
-    //       help: "help",
-    //       constraints: [
-    //         constraints.required('label is required')
-    //       ],
-    //       // render: (props) => <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
-    //     },
-    //     weight: {
-    //       type: type.number,
-    //       label: "weight",
-    //       constraints: [
-    //         constraints.max('100', 'a weight cannot be heavier than 100')
-    //       ]
-    //     },
-    //     rarity: {
-    //       type: type.string,
-    //       label: "rarity",
-    //       constraints: [
-    //         constraints.oneOf(['common', 'rare', 'epic', 'legendary'], 'one of rarity please..common, rare, epic or legendary')
-    //       ]
-    //     }
-    //   },
-    //   flow: ["label", "weight", "rarity"],
-    //   collapsable: true,
-    //   fieldOnCollapse: "label",
-    //   constraints: [
-    //     // constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
-    //     // constraints.length(2, '2 armes obligatoire'),
-    //     // constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100) //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200 
-    //     //todo: tester when en fonction de l'age
-    //   ],
-    //   // createOption: true,
-    //   // defaultValue: {label: "foo", weight: 0, rarity: 'common'}
+    weaponsForm: {
+      type: type.object,
+      format: format.form,
+      array: true,
+      label: 'armes',
+      help: "les armes du perso personnage",
+      // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
+      // transformer: (value) => ({label: value.weight, value: value.label}),
+      // options: [
+      //   { label: "toothpick", weight: 0, rarity: 'common' },
+      //   { label: "sword", weight: 2, rarity: 'common' }, 
+      //   { label: "bazooka", weight: 10, rarity: 'epic' },
+      //   { label: "excalibur", weight: 100, rarity: 'legendary' }],
+      schema: {
+        expert_mode: {
+          type: 'bool',
+          label: null,
+          defaultValue: false,
+          render: ({ value, onChange }) => {
+            return (
+              <button
+                type="button"
+                className="btn btn-sm btn-success me-3 mb-3"
+                onClick={() => onChange(!value)
+                }>
+                {!!value ? 'Show less' : 'Show more'}
+              </button >
+            );
+          }
+        },
+        label: {
+          type: type.string,
+          label: "label",
+          help: "help",
+          constraints: [
+            constraints.required('label is required')
+          ],
+          render: (props) => <input type="text" className="is-invalid" style={{ borderColor: 'orangered' }} value={props.value} onChange={e => props.onChange(e.target.value)} />
+        },
+        weight: {
+          type: type.number,
+          label: "weight",
+          constraints: [
+            constraints.max('100', 'a weight cannot be heavier than 100')
+          ]
+        },
+        rarity: {
+          type: type.string,
+          label: "rarity",
+          constraints: [
+            constraints.oneOf(['common', 'rare', 'epic', 'legendary'], 'one of rarity please..common, rare, epic or legendary')
+          ]
+        }
+      },
+      collapsable: true,
+      fieldOnCollapse: "label",
+      constraints: [
+        // constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
+        // constraints.length(2, '2 armes obligatoire'),
+        // constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100) //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200 
+        //todo: tester when en fonction de l'age
+      ],
+      // createOption: true,
+      // defaultValue: {label: "foo", weight: 0, rarity: 'common'}
 
-    // },
+    },
 
 
 
@@ -251,20 +304,20 @@ export const BackOffice = () => {
         constraints.length(5, 'en france 5 chiffre')
       ]
     },
-    // city: {
-    //   type: type.string,
-    //   isMulti: true,
-    //   createOption: true,
-    //   format: 'select',
-    //   label: 'ville',
-    //   help: 'Ville de résidence',
-    //   transformer: (value) => ({ label: value.label, value: value.id }),
-    //   options: [{ label: 'Neo-Tokyo', id: '1' }, { label: 'Asgard', id: '2' }, { label: 'Fondcombe', id: '3' }],
-    //   defaultValue: ['3'],
-    //   constraints: [
-    //     constraints.required(`Personne n'habite nulle-part jusqu'à preuve du contraire`)
-    //   ]
-    // },
+    city: {
+      type: type.string,
+      isMulti: true,
+      createOption: true,
+      format: 'select',
+      label: 'ville',
+      help: 'Ville de résidence',
+      transformer: (value) => ({ label: value.label, value: value.id }),
+      options: [{ label: 'Neo-Tokyo', id: '1' }, { label: 'Asgard', id: '2' }, { label: 'Fondcombe', id: '3' }],
+      defaultValue: ['3'],
+      constraints: [
+        constraints.required(`Personne n'habite nulle-part jusqu'à preuve du contraire`)
+      ]
+    },
     abilities: {
       type: type.string,
       array: true,
@@ -277,7 +330,7 @@ export const BackOffice = () => {
       ],
       // render: (props) => {
       //   return <div className="d-flex">
-      //     <input type="text" className="is-invalid" value={props.value} onChange={e => props.onChange(e.target.value)} />
+      //     <input type="text" className="is-invalid" style={{borderColor: 'tomato'}} value={props.value} onChange={e => props.onChange([e.target.value])} />
       //     {props.error && <div style={{ color: 'tomato' }}>{props.error.message}</div>}
       //   </div>
       // }
@@ -301,13 +354,16 @@ export const BackOffice = () => {
     },
     code: {
       type: type.string,
-      format: 'code',
+      format: format.code,
       label: 'just code',
       help: 'Juste du code, hop hop hop',
       props: {
         mode: 'json',
         theme: 'monokai',
-        width: '100%'
+        width: '100%',
+        height: "400px",
+        foo: 'bar',
+        setRef: ref => console.error({ ref })
       },
       constraints: [
         constraints.required('le code est requis merci')
@@ -411,20 +467,20 @@ export const BackOffice = () => {
       }
 
     },
-    'city': {
-      type: type.string,
-      // isMulti: true,
-      // createOption: true,
-      format: 'select',
-      label: 'city - string select',
-      help: 'Ville de résidence',
-      transformer: (value) => ({ label: value.label, value: value.id }),
-      options: [{ label: 'Neo-Tokyo', id: '1' }, { label: 'Asgard', id: '2' }, { label: 'Fondcombe', id: '3' }],
-      defaultValue: '3',
-      constraints: [
-        constraints.required(`Personne n'habite nulle-part jusqu'à preuve du contraire`)
-      ]
-    },
+    // 'city': {
+    //   type: type.string,
+    //   // isMulti: true,
+    //   // createOption: true,
+    //   format: 'select',
+    //   label: 'city - string select',
+    //   help: 'Ville de résidence',
+    //   transformer: (value) => ({ label: value.label, value: value.id }),
+    //   options: [{ label: 'Neo-Tokyo', id: '1' }, { label: 'Asgard', id: '2' }, { label: 'Fondcombe', id: '3' }],
+    //   defaultValue: '3',
+    //   constraints: [
+    //     constraints.required(`Personne n'habite nulle-part jusqu'à preuve du contraire`)
+    //   ]
+    // },
     'cityCreation': {
       type: type.string,
       // isMulti: true,
@@ -500,17 +556,17 @@ export const BackOffice = () => {
     'weapon': {
       type: type.object,
       format: 'select',
-      // isMulti: true,
+      array: true,
       label: 'weapon - obj select',
-      // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
-      defaultValue: { label: "toothpick", weight: 0, rarity: 'common' },
+      optionsFrom: "https://formslibtestoptions.opunmaif.fr",
+      // defaultValue: [{ label: "toothpick", weight: 0, rarity: 'common' }],
       transformer: (value) => ({ label: value.label, value }),
-      options: [
-        { label: "toothpick", weight: 0, rarity: 'common' },
-        { label: "sword", weight: 2, rarity: 'rare' },
-        { label: "bazooka", weight: 10, rarity: 'epic' },
-        { label: "excalibur", weight: 100, rarity: 'legendary' },
-        { label: "Mjolnir", weight: 100, rarity: "legendary" }],
+      // options: [
+      //   { label: "toothpick", weight: 0, rarity: 'common' },
+      //   { label: "sword", weight: 2, rarity: 'rare' },
+      //   { label: "bazooka", weight: 10, rarity: 'epic' },
+      //   { label: "excalibur", weight: 100, rarity: 'legendary' },
+      //   { label: "Mjolnir", weight: 100, rarity: "legendary" }],
 
     },
     'weaponFrom': {
@@ -596,20 +652,34 @@ export const BackOffice = () => {
     'weaponsCreationHandled': {
       type: type.object,
       format: 'select',
-      isMulti: true,
-      createOption: true,
       label: 'weapon - obj multi select with creation handled',
-      // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
       defaultValue: [{ label: "toothpick", weight: 0, rarity: 'common' }],
-      transformer: (value) => ({ label: value.label, value }),
-      onCreateOption: (label) => ({ label, weight: 5, rarity: 'common' }),
-      options: [
-        { label: "toothpick", weight: 0, rarity: 'common' },
-        { label: "sword", weight: 2, rarity: 'rare' },
-        { label: "bazooka", weight: 10, rarity: 'epic' },
-        { label: "excalibur", weight: 100, rarity: 'legendary' },
-        { label: "Mjolnir", weight: 100, rarity: "legendary" }],
+      constraints: [
+        constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
+        constraints.length(2, '2 armes obligatoire'),
+        constraints.when('age', age => age < 100, [
+          constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
+        ], [
+          constraints.test("weight", 'pas plus de 1000 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 1000)
+        ])
+        //todo: use when to have abilitie to supprot more than 100kg when perso.age > 200
+        //todo: tester when en fonction de l'age
+      ],
+      props: {
+        isMulti: true,
+        createOption: true,
+        transformer: (value) => ({ label: value.label, value }),
+        onCreateOption: (label) => ({ label, weight: 5, rarity: 'common' }),
+        // optionsFrom: "https://formslibtestoptions.opunmaif.fr",
+        options: [
+          { label: "toothpick", weight: 0, rarity: 'common' },
+          { label: "sword", weight: 2, rarity: 'rare' },
+          { label: "bazooka", weight: 10, rarity: 'epic' },
+          { label: "excalibur", weight: 100, rarity: 'legendary' },
+          { label: "mega-excalibur", weight: 1000, rarity: 'legendary' },
+          { label: "Mjolnir", weight: 100, rarity: "legendary" }],
 
+      }
     },
     citiesArray: {
       type: type.string,
@@ -657,31 +727,67 @@ export const BackOffice = () => {
       // constraints: [
       //   constraints.url()
       // ],
+    },
+    metadata: {
+      type: type.object,
+      label: 'metadata',
+      array: true,
+      // human: {
+      //   type: type.bool, //todo: cool si on peu chainer des input ==> input pour le nom de l'espece du perso (option visible peut etre avec une fonction)
+      //   label: 'is human ?',
+      //   help: "le personnage est il humain",
+      //   defaultValue: false,
+      //   render: props => <div>
+      //     <div className="form-check">
+      //       <input className="form-check-input" type="radio" name="testexampleRadios" id="isHuman" value={'true'} checked={!!props.value ? 'checked' : null}
+      //         onChange={() => props.onChange(true)} />
+      //       <label className="form-check-label" htmlFor="isHuman">
+      //         Oui
+      //       </label>
+      //     </div>
+      //     <div className="form-check">
+      //       <input className="form-check-input" type="radio" name="testexampleRadios" id="isNotHuman" value={'false'} checked={!!props.value ? null : 'checked'}
+      //         onChange={() => props.onChange(false)} />
+      //       <label className="form-check-label" htmlFor="isNotHuman">
+      //         Non
+      //       </label>
+      //     </div>
+      //   </div>
+      // }
     }
   }
 
   const formFlow = [
-    {
-      label: 'Your personnage',
-      flow: ['bio',
-        'game',
-        'name',
-        'age',
-        'city',],
-      collapsed: true
-    },
-    {
-      label: 'father of your personnage',
-      flow: [
-        'fatherName',
-        'fatherAge'
-      ],
-      collapsed: true
-    },
+    // {
+    //   label: 'Your personnage',
+    //   flow: [
+    // 'bio',
+    // 'game',
+    // 'name',
+    // 'metadata',
+    //     'age',
+    //     'city',],
+    //   collapsed: true
+    // },
+    // {
+    //   label: 'father of your personnage',
+    //   flow: [
+    //     'fatherName',
+    //     'fatherAge'
+    //   ],
+    //   collapsed: true
+    // },
+    // {
+    //   label: 'human',
+    //   flow: [
     // 'human',
-    // 'species',
     // 'genre',
-    // 'weapon',
+    // 'species',
+    // 'test',
+    //   ],
+    //   collapsed: false,
+    // },
+    'weapon',
     // 'weapons',
     // // 'birthday',
     // 'abilities',
@@ -698,11 +804,17 @@ export const BackOffice = () => {
     // 'cities',
     // 'citiesCreation',
     // 'citiesCreationHandled',
-    // 'weapon',
+    // {
+    //   label: 'test',
+    //   flow: [
+    //     'weapon',
+    //   ]
+    // },
     // 'weaponCreation',
     // 'weaponCreationHandled',
     // 'weapons',
     // 'weaponsCreation',
+    // 'age',
     // 'weaponsCreationHandled',
     // 'citiesArray',
     // 'weaponsArray',
@@ -747,81 +859,165 @@ export const BackOffice = () => {
     test: undefined
   }
 
-  const test = {
-    'city': '1',
-    'cityCreation': '1',
-    'cityCreationHandled': '1',
-    'cities': ['1', '2'],
-    'citiesCreation': ['1', '2'],
-    'citiesCreationHandled': ['1', '2'],
-    'weapon': { label: "toothpick", weight: 0, rarity: 'common' },
-    'weaponCreation': { label: "toothpick", weight: 0, rarity: 'common' },
-    'weaponCreationHandled': { label: "toothpick", weight: 0, rarity: 'common' },
-    'weapons': [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
-    'weaponsCreation': [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
-    'weaponsCreationHandled': [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
-    'citiesArray': ['3', '3'],
-    'weaponsArray': [{ label: "toothpick", weight: 0, rarity: 'common' }, { label: "sword", weight: 2, rarity: 'rare' }],
-    'stringArray': ['foo', 'bar']
+
+
+  const energy = { "1": 'diesel', "2": 'essence', "3": 'autres' }
+
+
+  const dtcschema = {
+    name: {
+      type: type.string,
+      label: "Nom du personnage",
+      disabled:true,
+      constraints: [
+        constraints.required("Le nom est requis")
+      ]
+
+    },
+    birthday: {
+      type: type.date,
+      label: "Date de naissance",
+      constraints: [
+        constraints.required("valeur requise"),
+        constraints.max(new Date(), "pas de naissance dans le future")
+      ]
+    },
+    poids: {
+      type: type.number,
+      label: "Poids",
+      constraints: [
+        constraints.required("valeure requise"),
+        constraints.positive("impossible !!")
+      ]
+    },
+    biographie: {
+      type: type.string,
+      format: format.text,
+      label: 'Biographie',
+    },
+    isHuman: {
+      type: type.bool,
+      label: 'Humain ?',
+      constraints: [
+        constraints.required("valeur requise")
+      ]
+    },
+    genre: {
+      type: type.string,
+      format: format.select,
+      options: genres,
+      constraints: [
+        constraints.required("valeur requise")
+      ]
+    },
+    species: {
+      type: type.string,
+      visible: { ref: 'isHuman', test: is => !is },
+      label: 'Espèce',
+      constraints: [
+        constraints.when('isHuman', is => !is, [
+          constraints.oneOf(["elf", "orc", "semi-dragon"], "l'espece doit etre particuliere (elf, orc ou semi-dragon)"),
+          constraints.required("l'espece est requise si non-humain"),
+        ])
+      ]
+    },
+    alignment: {
+      type: type.object,
+      format: format.form,
+      schema: {
+        lawVsChaos: {
+          type: type.string,
+          format: format.buttonsSelect,
+          options: ["law", "neutral", "chaos"]
+        },
+        goodVsEvil: {
+          type: type.string,
+          format: format.buttonsSelect,
+          options: ["good", "neutral", "evil"]
+        }
+      },
+      constraints: [
+        constraints.required("valeure requise")
+      ]
+    },
+    weapons: {
+      type: type.string,
+      format: format.select,
+      isMulti: true,
+      optionsFrom: "http://localhost:3042/",
+      defaultValue: [{ label: "toothpick - 0 kg", weight: 0, rarity: 'common' }],
+      transformer: (value) => ({ label: `${value.label} - ${value.weight} kg`, value }),
+      constraints: [
+        constraints.min(1, 'Pas de combat à mains nues, c\'est dangereux !'),
+        constraints.test("weight", 'pas plus de 100 kg', value => value.reduce((a, c) => a + c.weight, 0) <= 100)
+      ]
+    },
   }
 
-  // const Wrapper = ({ entry, label, error, children}) => {
-  //   return (
-  //     <div className="d-flex flex-row">
-  //       <label className="form-label" htmlFor={entry}>{label}</label>
-  //       {children}
-  //       {error && <div className="invalid-feedback">{error.message}</div>}
-  //     </div>
-  //   )
-  // }
-  const ref = useRef()
+  const rafschema = {
+    name: {
+      type: type.string,
+      label: "Nom (etienne)",
+      defaultValue: "",
+      className:"etienne",
+      constraints: [
+        // constraints.required("ce champs est requis"),
+        constraints.matches(/^e.*$/, "c'est pas etienne !!!")
+      ]
+    },
+  }
+
+
+  const [testSchema, setTestSchema] = useState(dtcschema);
+  const changeSchema = () => {
+    if (testSchema.name.label === "Nom (etienne)") {
+      setTestSchema(dtcschema)
+    } else {
+      setTestSchema(rafschema)
+    }
+  }
+
+
+
+  const rf = useRef()
+  const planTest = { "_id": "cy7d7gft18uyymtgrjfyyf9styvuzre7", "type": "FreeWithQuotas", "currency": { "code": "EUR" }, "customName": "Refined Fresh Ball plan", "customDescription": "Free plan with limited number of calls per day and per month", "maxPerSecond": 10, "maxPerDay": 1000, "maxPerMonth": 1000, "billingDuration": { "value": 1, "unit": "month" }, "visibility": "Public", "subscriptionProcess": "Automatic", "integrationProcess": "ApiKey", "rotation": false, "otoroshiTarget": { "otoroshiSettings": null, "authorizedEntities": { "groups": [], "services": [] }, "apikeyCustomization": { "clientIdOnly": false, "constrainedServicesOnly": false, "tags": [], "metadata": {}, "customMetadata": [], "restrictions": { "enabled": false, "allowLast": true, "allowed": [], "forbidden": [], "notFound": [] } } } }
+
   return (
-    <div className="container-xxl my-md-4 bd-layout" style={{
-      marginTop: '1.5rem',
-      marginBottom: '1.5rem',
-      width: '100%',
-      padding: '.75rem',
-      marginRight: 'auto',
-      marginLeft: 'auto',
-    }}>
+    <div style={{
+      padding: "0 25px"
+    }} >
       <h1>BaCk OffIcE</h1>
 
-      <button className="btn btn-info" onClick={() => setUser(loki)}>Loki</button>
-      <button className="btn btn-info" onClick={() => setUser(thor)}>Thor</button>
+      {/* <button className="btn btn-info" onClick={() => setUser(loki)}>Loki</button>
+      <button className="btn btn-info" onClick={() => setUser(thor)}>Thor</button> */}
+
+
+
 
       <div>
+        {/* <pre>{error}</pre> */}
+        {/* <pre>{JSON.stringify(user, null, 4)}</pre> */}
+        <button onClick={changeSchema}>change schema</button>
         <Form
-          schema={formSchema}
-          flow={formFlow}
-          onSubmit={d => console.error({ d })}
-          onError={(errors, e) => console.warn(errors, e)}
-          value={user}
+          schema={testSchema}
+          // flow={formFlow}
+          onSubmit={data => console.debug(data)}
+          onError={(errors, e) => console.error(errors, e)}
+          nostyle={false}
+          style={{
+            input: {
+              color: "seaGreen",
+              border: "1px solid tomato",
+            }
+          }}
+        value={{
+          name: "Thor"
+        }}
         // options={{
-        //   watch: true,
-        //   autosubmit: true
+        //   watch: true
         // }}
-        // ref={ref}
-        // autosave={true}
-        // inputWrapper={Wrapper}
-        // footer={({ reset, valid }) => {
-        //   return (
-        //     <div className="d-flex justify-content-end">
-        //       <button className="btn btn-primary m-3" onClick={reset}>reset</button>
-        //       <button className="btn btn-success m-3" onClick={valid}>accept</button>
-        //     </div>
-        //   )
-        // }}
-        // httpClient={(url, method) => fetch(url, {
-        //   method,
-        //   headers: {
-        //     Accept: 'application/json',
-        //     'Content-Type': 'application/json',
-        //     'X-foo': 'bar'
-        //   }
-        // })}
         />
-        {/* <button onClick={() => ref.current.handleSubmit()}>TEST REF</button> */}
       </div>
-    </div>
+    </div >
   )
 }

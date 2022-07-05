@@ -1,11 +1,11 @@
 import './App.css';
 
-import {BackOffice} from "./component/backoffice"
+import {ReactForm} from './component/bench'
 
 function App() {
   return (
     <div className="App">
-      <BackOffice />
+      <ReactForm />
     </div>
   );
 }
