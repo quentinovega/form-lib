@@ -42,6 +42,7 @@ export const ReactForm = () => {
       <Form
         schema={schema}
         onSubmit={d => onSubmit(d)}
+        flow={[{label: 'collapse', flow: ['date', 'datetime', 'time']}]}
         options={{
           // autosubmit: true,
           // actions: {
